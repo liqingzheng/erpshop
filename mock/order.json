@@ -1,0 +1,23 @@
+{
+  "orders": [
+    { "key": "1", "orderNo": "TB20240413001", "shop": "天猫旗舰店", "buyer": "小明", "amount": "¥ 299.00", "payAmount": "¥ 259.00", "status": "待审核", "time": "2024-04-13 09:23" },
+    { "key": "2", "orderNo": "JD20240413002", "shop": "京东自营", "buyer": "阿伟", "amount": "¥ 1,599.00", "payAmount": "¥ 1,499.00", "status": "待发货", "time": "2024-04-13 08:45" },
+    { "key": "3", "orderNo": "PDD20240413003", "shop": "拼多多专营店", "buyer": "小红", "amount": "¥ 89.00", "payAmount": "¥ 79.00", "status": "已发货", "time": "2024-04-12 22:10" },
+    { "key": "4", "orderNo": "DY20240413004", "shop": "抖音直播间", "buyer": "老王", "amount": "¥ 599.00", "payAmount": "¥ 499.00", "status": "售后中", "time": "2024-04-12 20:05" },
+    { "key": "5", "orderNo": "TB20240413005", "shop": "天猫旗舰店", "buyer": "Lisa", "amount": "¥ 199.00", "payAmount": "¥ 189.00", "status": "已完成", "time": "2024-04-11 14:30" }
+  ],
+  "refunds": [
+    { "key": "1", "refundNo": "RF2024001", "orderNo": "TB20240413001", "type": "仅退款", "amount": "¥ 259.00", "reason": "拍错/不想要", "status": "待审核" },
+    { "key": "2", "refundNo": "RF2024002", "orderNo": "JD20240413002", "type": "退货退款", "amount": "¥ 1,499.00", "reason": "质量问题", "status": "仓库质检中" }
+  ],
+  "promotions": [
+    { "key": "1", "orderNo": "TB20240413001", "promo": "满减", "discount": "-¥ 40", "gift": "-", "priceProtect": "已价保" },
+    { "key": "2", "orderNo": "JD20240413002", "promo": "优惠券", "discount": "-¥ 100", "gift": "数据线*1", "priceProtect": "无价保" },
+    { "key": "3", "orderNo": "PDD20240413003", "promo": "秒杀", "discount": "-¥ 10", "gift": "-", "priceProtect": "无价保" }
+  ],
+  "risks": [
+    { "key": "1", "orderNo": "TB20240413R01", "riskType": "大额订单", "score": 85, "rule": "单笔金额>5000", "handle": "已拦截" },
+    { "key": "2", "orderNo": "PDD20240413R02", "riskType": "重复下单", "score": 72, "rule": "30分钟内同SKU下单>5", "handle": "已拦截" },
+    { "key": "3", "orderNo": "JD20240413R03", "riskType": "地址异常", "score": 45, "rule": "无法配送区域", "handle": "已放行" }
+  ]
+}

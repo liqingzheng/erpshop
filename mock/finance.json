@@ -1,0 +1,26 @@
+{
+  "arSummary": { "total": 152300, "received": 98400 },
+  "apSummary": { "total": 218600, "paid": 156200 },
+  "arList": [
+    { "key": "1", "bizNo": "TB20240413001", "platform": "天猫旗舰店", "amount": "¥ 259.00", "received": "¥ 259.00", "balance": "¥ 0", "aging": 0, "status": "已结清" },
+    { "key": "2", "bizNo": "JD20240413002", "platform": "京东自营", "amount": "¥ 1,499.00", "received": "¥ 0", "balance": "¥ 1,499.00", "aging": 3, "status": "待结算" }
+  ],
+  "apList": [
+    { "key": "1", "bizNo": "PO20240413001", "supplier": "深圳声迈电子有限公司", "amount": "¥ 128,000", "paid": "¥ 64,000", "balance": "¥ 64,000", "dueDate": "2024-05-10", "status": "待付款" },
+    { "key": "2", "bizNo": "LOG20240413001", "supplier": "顺丰速运", "amount": "¥ 12,400", "paid": "¥ 12,400", "balance": "¥ 0", "dueDate": "2024-04-20", "status": "已付清" }
+  ],
+  "costs": [
+    { "key": "1", "skuCode": "SKU2024001-01", "cost": "¥ 320", "freight": "¥ 4.5", "package": "¥ 1.2", "commission": "¥ 18", "ad": "¥ 8", "total": "¥ 351.7" },
+    { "key": "2", "skuCode": "SKU2024001-02", "cost": "¥ 380", "freight": "¥ 4.5", "package": "¥ 1.2", "commission": "¥ 21", "ad": "¥ 9", "total": "¥ 415.7" }
+  ],
+  "profitSummary": { "gross": 342100, "net": 128400, "margin": 12.4 },
+  "profitList": [
+    { "key": "1", "date": "2024-04-11", "sales": "¥ 45,200", "cost": "¥ 28,100", "expense": "¥ 5,200", "gross": "¥ 11,900", "grossRate": "26.3%" },
+    { "key": "2", "date": "2024-04-12", "sales": "¥ 52,800", "cost": "¥ 33,400", "expense": "¥ 6,100", "gross": "¥ 13,300", "grossRate": "25.2%" },
+    { "key": "3", "date": "2024-04-13", "sales": "¥ 26,600", "cost": "¥ 16,200", "expense": "¥ 3,200", "gross": "¥ 7,200", "grossRate": "27.1%" }
+  ],
+  "fundFlows": [
+    { "key": "1", "flowNo": "F20240413001", "account": "支付宝商户号", "type": "收入", "amount": "+¥ 45,200", "balance": "¥ 128,600", "time": "2024-04-13 10:00", "remark": "平台结算款" },
+    { "key": "2", "flowNo": "F20240413002", "account": "银行账户", "type": "支出", "amount": "-¥ 64,000", "balance": "¥ 256,000", "time": "2024-04-13 14:30", "remark": "采购付款" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "warehouses": [
+    { "key": "1", "code": "WH001", "name": "华东一号仓", "type": "自营仓", "address": "浙江杭州余杭区", "area": 12000, "status": "启用" },
+    { "key": "2", "code": "WH002", "name": "华南二号仓", "type": "自营仓", "address": "广东广州白云区", "area": 8500, "status": "启用" },
+    { "key": "3", "code": "WH003", "name": "美国海外仓", "type": "海外仓", "address": "California, USA", "area": 5000, "status": "启用" }
+  ],
+  "inventoryList": [
+    { "key": "1", "skuCode": "SKU2024001-01", "warehouse": "华东一号仓", "location": "A-01-02-03", "available": 850, "locked": 50, "inTransit": 300, "frozen": 0, "status": "正常" },
+    { "key": "2", "skuCode": "SKU2024001-02", "warehouse": "华东一号仓", "location": "A-01-02-04", "available": 620, "locked": 30, "inTransit": 200, "frozen": 0, "status": "正常" },
+    { "key": "3", "skuCode": "SKU2024002-01", "warehouse": "华南二号仓", "location": "B-03-01-01", "available": 180, "locked": 20, "inTransit": 0, "frozen": 0, "status": "安全库存不足" }
+  ],
+  "inbounds": [
+    { "key": "1", "inNo": "IN20240413001", "type": "采购入库", "warehouse": "华东一号仓", "skuCount": 3, "qty": 1500, "status": "已完成" },
+    { "key": "2", "inNo": "IN20240413002", "type": "退货入库", "warehouse": "华南二号仓", "skuCount": 1, "qty": 20, "status": "质检中" }
+  ],
+  "outbounds": [
+    { "key": "1", "outNo": "OUT20240413001", "type": "销售出库", "warehouse": "华东一号仓", "skuCount": 5, "qty": 320, "status": "已出库" },
+    { "key": "2", "outNo": "OUT20240413002", "type": "调拨出库", "warehouse": "华南二号仓", "skuCount": 2, "qty": 100, "status": "拣货中" }
+  ],
+  "alerts": {
+    "safeStock": 3,
+    "overStock": 1,
+    "expire": 0
+  }
+}

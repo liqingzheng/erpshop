@@ -1,0 +1,63 @@
+{
+  "kpi": {
+    "gmv": 124580,
+    "orders": 1245,
+    "pendingShip": 86,
+    "stockAlert": 12,
+    "visitors": 3842,
+    "refund": 3240,
+    "conversion": "3.24%",
+    "profitToday": 18650
+  },
+  "salesTrend": {
+    "xAxis": ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+    "sales": [12000, 15200, 10100, 18400, 23000, 24800, 21500],
+    "orders": [820, 932, 901, 1134, 1290, 1330, 1220]
+  },
+  "todayRealtime": {
+    "hours": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00", "23:59"],
+    "gmv": [1200, 800, 3500, 8200, 15600, 24800, 21500],
+    "orders": [80, 50, 220, 540, 980, 1330, 1220]
+  },
+  "categoryPie": [
+    { "value": 1048, "name": "数码家电" },
+    { "value": 735, "name": "服装鞋包" },
+    { "value": 580, "name": "美妆个护" },
+    { "value": 484, "name": "食品生鲜" },
+    { "value": 300, "name": "家居日用" }
+  ],
+  "profitPie": [
+    { "value": 342100, "name": "毛利" },
+    { "value": 213700, "name": "费用" },
+    { "value": 128400, "name": "净利" }
+  ],
+  "warehouseBar": {
+    "xAxis": ["1号仓", "2号仓", "3号仓", "海外仓", "门店仓"],
+    "data": [3200, 2800, 1500, 900, 600]
+  },
+  "todo": [
+    { "type": "warning", "title": "待审核订单", "count": 12, "link": "/order" },
+    { "type": "danger", "title": "库存预警", "count": 3, "link": "/inventory" },
+    { "type": "info", "title": "物流异常", "count": 2, "link": "/logistics" },
+    { "type": "success", "title": "采购到货", "count": 5, "link": "/purchase" }
+  ],
+  "latestOrders": [
+    { "orderNo": "TB20240413001", "shop": "天猫旗舰店", "buyer": "小明", "amount": "¥ 259.00", "status": "待审核", "time": "09:23" },
+    { "orderNo": "JD20240413002", "shop": "京东自营", "buyer": "阿伟", "amount": "¥ 1,499.00", "status": "待发货", "time": "08:45" },
+    { "orderNo": "PDD20240413003", "shop": "拼多多专营店", "buyer": "小红", "amount": "¥ 79.00", "status": "已发货", "time": "22:10" },
+    { "orderNo": "DY20240413004", "shop": "抖音直播间", "buyer": "老王", "amount": "¥ 499.00", "status": "售后中", "time": "20:05" },
+    { "orderNo": "TB20240413005", "shop": "天猫旗舰店", "buyer": "Lisa", "amount": "¥ 189.00", "status": "已完成", "time": "14:30" }
+  ],
+  "operations": {
+    "conversionRate": "3.24%",
+    "avgOrderValue": "¥ 186.5",
+    "returnRate": "2.1%",
+    "roi": "4.8"
+  },
+  "finance": {
+    "grossProfit": "¥ 342,100",
+    "ar": "¥ 128,400",
+    "ap": "¥ 86,200",
+    "netMargin": "12.4%"
+  }
+}

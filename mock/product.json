@@ -1,0 +1,34 @@
+{
+  "spuList": [
+    { "key": "1", "spuCode": "SPU2024001", "title": "智能降噪无线蓝牙耳机 超长续航", "image": "https://placehold.co/60x60/1677ff/ffffff?text=P1", "category": "数码家电", "brand": "声迈", "status": "已上架" },
+    { "key": "2", "spuCode": "SPU2024002", "title": "纯棉休闲短袖T恤 夏季新款", "image": "https://placehold.co/60x60/52c41a/ffffff?text=P2", "category": "服装鞋包", "brand": "布衣", "status": "已上架" },
+    { "key": "3", "spuCode": "SPU2024003", "title": "玻尿酸补水面膜 10片装", "image": "https://placehold.co/60x60/f5222d/ffffff?text=P3", "category": "美妆个护", "brand": "美肤堂", "status": "待审核" },
+    { "key": "4", "spuCode": "SPU2024004", "title": "即食燕麦片 营养早餐", "image": "https://placehold.co/60x60/fa8c16/ffffff?text=P4", "category": "食品生鲜", "brand": "谷香园", "status": "已上架" },
+    { "key": "5", "spuCode": "SPU2024005", "title": "多功能厨房置物架", "image": "https://placehold.co/60x60/722ed1/ffffff?text=P5", "category": "家居日用", "brand": "宜居", "status": "已下架" }
+  ],
+  "skuList": [
+    { "key": "1", "skuCode": "SKU2024001-01", "spec": "黑色 / 64GB", "barcode": "6901234567890", "cost": "¥ 320", "sale": "¥ 599", "stock": 1200 },
+    { "key": "2", "skuCode": "SKU2024001-02", "spec": "白色 / 128GB", "barcode": "6901234567891", "cost": "¥ 380", "sale": "¥ 699", "stock": 850 },
+    { "key": "3", "skuCode": "SKU2024002-01", "spec": "M码 / 蓝色", "barcode": "6901234567892", "cost": "¥ 35", "sale": "¥ 89", "stock": 2300 }
+  ],
+  "categories": [
+    { "key": "1", "name": "数码家电", "level": 1, "children": "手机配件, 智能穿戴, 电脑办公" },
+    { "key": "2", "name": "服装鞋包", "level": 1, "children": "男装, 女装, 鞋靴, 箱包" },
+    { "key": "3", "name": "美妆个护", "level": 1, "children": "面部护肤, 彩妆香氛" }
+  ],
+  "brands": [
+    { "key": "1", "name": "声迈", "country": "中国", "category": "数码家电", "status": "正常" },
+    { "key": "2", "name": "布衣", "country": "中国", "category": "服装鞋包", "status": "正常" },
+    { "key": "3", "name": "美肤堂", "country": "韩国", "category": "美妆个护", "status": "授权到期预警" }
+  ],
+  "lifecycle": [
+    { "key": "1", "spuCode": "SPU2024006", "title": "便携式折叠自行车", "status": "潜力爆款", "days": 15 },
+    { "key": "2", "spuCode": "SPU2024007", "title": "复古胶片相机", "status": "滞销", "days": 210 },
+    { "key": "3", "spuCode": "SPU2024008", "title": "无线充电板", "status": "爆款", "days": 8 }
+  ],
+  "prices": [
+    { "key": "1", "skuCode": "SKU2024001-01", "spec": "黑色 / 64GB", "cost": "¥ 320", "sale": "¥ 599", "member": "¥ 569", "activity": "¥ 499", "platform": "¥ 599", "sync": "同步成功" },
+    { "key": "2", "skuCode": "SKU2024001-02", "spec": "白色 / 128GB", "cost": "¥ 380", "sale": "¥ 699", "member": "¥ 659", "activity": "¥ 599", "platform": "¥ 699", "sync": "同步成功" },
+    { "key": "3", "skuCode": "SKU2024002-01", "spec": "M码 / 蓝色", "cost": "¥ 35", "sale": "¥ 89", "member": "¥ 79", "activity": "¥ 69", "platform": "¥ 89", "sync": "同步失败" }
+  ]
+}

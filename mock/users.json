@@ -1,0 +1,35 @@
+{
+  "roles": [
+    { "key": "super_admin", "name": "超级管理员", "permissions": ["*"] },
+    { "key": "operator", "name": "运营专员", "permissions": ["product:view","product:edit","order:view","order:edit","purchase:view","inventory:view","inventory:edit","data:view","finance:view","logistics:view","dashboard:view"] },
+    { "key": "purchase", "name": "采购专员", "permissions": ["purchase:view","purchase:edit","inventory:view","product:view","dashboard:view"] },
+    { "key": "warehouse", "name": "仓库人员", "permissions": ["inventory:view","inventory:edit","order:view","logistics:view","dashboard:view"] },
+    { "key": "finance", "name": "财务人员", "permissions": ["finance:view","finance:edit","order:view","data:view","dashboard:view"] },
+    { "key": "logistics", "name": "物流专员", "permissions": ["logistics:view","logistics:edit","order:view","inventory:view","dashboard:view"] }
+  ],
+  "users": [
+    { "id": "1", "username": "admin", "nickname": "超级管理员", "phone": "13800138000", "role": "super_admin", "status": "启用" },
+    { "id": "2", "username": "operator", "nickname": "运营专员-小李", "phone": "13900139000", "role": "operator", "status": "启用" },
+    { "id": "3", "username": "purchase01", "nickname": "采购专员-张哥", "phone": "13700137000", "role": "purchase", "status": "启用" },
+    { "id": "4", "username": "warehouse01", "nickname": "仓库主管-王姐", "phone": "13600136000", "role": "warehouse", "status": "启用" },
+    { "id": "5", "username": "finance01", "nickname": "财务经理-陈总", "phone": "13500135000", "role": "finance", "status": "启用" },
+    { "id": "6", "username": "logistics01", "nickname": "物流专员-刘哥", "phone": "13400134000", "role": "logistics", "status": "停用" }
+  ],
+  "allPermissions": [
+    { "key": "dashboard:view", "label": "统计Dashboard", "module": "Dashboard" },
+    { "key": "product:view", "label": "产品查看", "module": "产品管理" },
+    { "key": "product:edit", "label": "产品编辑", "module": "产品管理" },
+    { "key": "order:view", "label": "订单查看", "module": "订单管理" },
+    { "key": "order:edit", "label": "订单编辑", "module": "订单管理" },
+    { "key": "purchase:view", "label": "采购查看", "module": "采购管理" },
+    { "key": "purchase:edit", "label": "采购编辑", "module": "采购管理" },
+    { "key": "inventory:view", "label": "库存查看", "module": "库存管理" },
+    { "key": "inventory:edit", "label": "库存编辑", "module": "库存管理" },
+    { "key": "data:view", "label": "数据中心", "module": "数据中心" },
+    { "key": "finance:view", "label": "财务查看", "module": "财务管理" },
+    { "key": "finance:edit", "label": "财务编辑", "module": "财务管理" },
+    { "key": "logistics:view", "label": "物流查看", "module": "物流管理" },
+    { "key": "logistics:edit", "label": "物流编辑", "module": "物流管理" },
+    { "key": "system:settings", "label": "系统设置", "module": "系统" }
+  ]
+}

@@ -1,0 +1,144 @@
+/* 炫酷登录页样式 */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 粒子层 */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  animation: floatUp 10s linear infinite;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* 玻璃卡片 */
+.glass-card {
+  width: 420px;
+  padding: 40px 32px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  color: #fff;
+}
+
+.login-logo {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+}
+
+.glass-card h1 {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #fff, #c7d2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glass-card .subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+/* 覆盖antd输入框在深色背景下的样式 - 透明背景+白色边框 */
+.glass-card .ant-input,
+.glass-card .ant-input-password,
+.glass-card .ant-input-affix-wrapper {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #fff !important;
+  transition: all 0.3s ease;
+}
+.glass-card .ant-input-affix-wrapper:focus,
+.glass-card .ant-input-affix-wrapper-focused,
+.glass-card .ant-input:focus {
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15) !important;
+}
+.glass-card .ant-input::placeholder,
+.glass-card .ant-input-password input::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.glass-card .ant-input-affix-wrapper .anticon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+.glass-card .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.login-btn {
+  height: 44px;
+  font-size: 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border: none;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+  transition: transform 0.2s;
+}
+.login-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.demo-account {
+  margin-top: 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}

@@ -1,0 +1,25 @@
+{
+  "etlJobs": [
+    { "key": "1", "name": "订单数据同步", "source": "order-service", "target": "dwd_order_detail", "schedule": "每15分钟", "lastRun": "2024-04-13 10:00", "status": "成功" },
+    { "key": "2", "name": "库存快照同步", "source": "inventory-service", "target": "dwd_inventory_snapshot", "schedule": "每小时", "lastRun": "2024-04-13 09:00", "status": "成功" },
+    { "key": "3", "name": "日报汇总计算", "source": "DWD层", "target": "dws_sales_daily", "schedule": "每日凌晨", "lastRun": "2024-04-13 02:00", "status": "成功" }
+  ],
+  "reports": [
+    { "key": "1", "name": "销售日报", "type": "固定报表", "cycle": "每日", "lastUpdate": "2024-04-13 09:00", "status": "正常" },
+    { "key": "2", "name": "库存周报", "type": "固定报表", "cycle": "每周一", "lastUpdate": "2024-04-08 09:00", "status": "正常" },
+    { "key": "3", "name": "利润月报", "type": "固定报表", "cycle": "每月1日", "lastUpdate": "2024-04-01 09:00", "status": "正常" },
+    { "key": "4", "name": "大促活动效果分析", "type": "自定义报表", "cycle": "手动", "lastUpdate": "2024-04-12 15:30", "status": "正常" }
+  ],
+  "exports": [
+    { "key": "1", "task": "2024年3月销售明细", "format": "Excel", "rows": "12,450", "createTime": "2024-04-13 09:30", "status": "已完成" },
+    { "key": "2", "task": "全量SKU库存报表", "format": "CSV", "rows": "86,200", "createTime": "2024-04-13 09:15", "status": "生成中" }
+  ],
+  "funnel": {
+    "data": [
+      { "value": 100, "name": "曝光" },
+      { "value": 60, "name": "点击" },
+      { "value": 30, "name": "加购" },
+      { "value": 10, "name": "支付" }
+    ]
+  }
+}

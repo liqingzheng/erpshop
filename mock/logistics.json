@@ -1,0 +1,26 @@
+{
+  "carriers": [
+    { "key": "1", "code": "SF", "name": "顺丰速运", "settlement": "月结", "scope": "全国", "status": "启用" },
+    { "key": "2", "code": "ZTO", "name": "中通快递", "settlement": "月结", "scope": "全国", "status": "启用" },
+    { "key": "3", "code": "JD", "name": "京东物流", "settlement": "月结", "scope": "全国", "status": "启用" }
+  ],
+  "waybills": [
+    { "key": "1", "waybillNo": "SF1234567890", "carrier": "顺丰速运", "orderNo": "JD20240413002", "weight": 1.2, "freight": "¥ 18", "status": "已签收" },
+    { "key": "2", "waybillNo": "ZTO9876543210", "carrier": "中通快递", "orderNo": "PDD20240413003", "weight": 0.8, "freight": "¥ 8", "status": "运输中" }
+  ],
+  "exceptions": [
+    { "key": "1", "excNo": "EXP2024001", "waybillNo": "ZTO9876543210", "type": "72h无更新", "desc": "快件在转运中心停留超过72小时", "handler": "-", "status": "待处理" },
+    { "key": "2", "excNo": "EXP2024002", "waybillNo": "SF1234567890", "type": "签收异常", "desc": "客户反馈未收到但显示已签收", "handler": "张物流", "status": "已处理" }
+  ],
+  "warehouseStats": {
+    "wavePending": 8,
+    "waveDone": 42,
+    "avgPickTime": "4.2 min/单",
+    "pathOptimize": "+18%",
+    "scanCheck": true,
+    "weightCheck": true,
+    "imageCheck": false,
+    "pickPerPerson": "156 件/人/天",
+    "shipOnTimeRate": "98.5%"
+  }
+}

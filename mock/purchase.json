@@ -1,0 +1,24 @@
+{
+  "suppliers": [
+    { "key": "1", "code": "SUP001", "name": "深圳声迈电子有限公司", "contact": "张经理 13800138000", "settlement": "月结30天", "rating": "S", "status": "正常" },
+    { "key": "2", "code": "SUP002", "name": "广州布衣纺织厂", "contact": "李经理 13900139000", "settlement": "货到付款", "rating": "A", "status": "正常" },
+    { "key": "3", "code": "SUP003", "name": "上海美肤堂贸易", "contact": "王经理 13700137000", "settlement": "月结60天", "rating": "C", "status": "观察名单" }
+  ],
+  "suggestions": [
+    { "key": "1", "skuCode": "SKU2024001-01", "name": "蓝牙耳机 黑色 64GB", "safe": 500, "available": 120, "inTransit": 300, "suggest": 680, "supplier": "深圳声迈" },
+    { "key": "2", "skuCode": "SKU2024002-01", "name": "T恤 M码 蓝色", "safe": 800, "available": 200, "inTransit": 0, "suggest": 1000, "supplier": "广州布衣" }
+  ],
+  "purchaseOrders": [
+    { "key": "1", "poNo": "PO20240413001", "supplier": "深圳声迈电子有限公司", "amount": "¥ 128,000", "status": "部分到货", "progress": 60, "date": "2024-04-10" },
+    { "key": "2", "poNo": "PO20240413002", "supplier": "广州布衣纺织厂", "amount": "¥ 45,000", "status": "待审核", "progress": 0, "date": "2024-04-13" },
+    { "key": "3", "poNo": "PO20240413003", "supplier": "上海美肤堂贸易", "amount": "¥ 86,000", "status": "全部到货", "progress": 100, "date": "2024-04-05" }
+  ],
+  "receipts": [
+    { "key": "1", "receiptNo": "RCT2024001", "poNo": "PO20240413001", "qty": 500, "passQty": 480, "rejectQty": 20, "result": "合格" },
+    { "key": "2", "receiptNo": "RCT2024002", "poNo": "PO20240413003", "qty": 1000, "passQty": 950, "rejectQty": 50, "result": "让步接收" }
+  ],
+  "statements": [
+    { "key": "1", "month": "2024-03", "supplier": "深圳声迈电子有限公司", "amount": "¥ 256,000", "paid": "¥ 200,000", "balance": "¥ 56,000", "status": "已确认" },
+    { "key": "2", "month": "2024-03", "supplier": "广州布衣纺织厂", "amount": "¥ 89,000", "paid": "¥ 0", "balance": "¥ 89,000", "status": "待确认" }
+  ]
+}

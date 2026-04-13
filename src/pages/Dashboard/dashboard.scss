@@ -1,0 +1,221 @@
+// Dashboard 现代 B 端仪表板风格（参考 ui2.png）
+$db-bg: #f3f6fd;
+$db-card-bg: #ffffff;
+$db-primary: #4b70e2;
+$db-success: #22c55e;
+$db-warning: #f59e0b;
+$db-danger: #ef4444;
+$db-info: #3b82f6;
+$db-purple: #8b5cf6;
+
+.dashboard-modern {
+  background: $db-bg;
+  min-height: calc(100vh - 112px);
+  margin: -16px;
+  padding: 24px;
+
+  .db-section {
+    margin-top: 16px;
+  }
+
+  // 让同一行内的 Card 等高
+  .ant-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .ant-col {
+    display: flex;
+  }
+
+  .db-card {
+    background: $db-card-bg;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .ant-card-head {
+      border-bottom: none;
+      padding: 14px 20px 0;
+      min-height: 46px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .ant-card-body {
+      padding: 14px 20px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .db-kpi-card {
+    background: $db-card-bg;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s;
+    width: 100%;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .kpi-info {
+      flex: 1;
+
+      .kpi-title {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 2px;
+      }
+
+      .kpi-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+      }
+
+      .kpi-trend {
+        font-size: 12px;
+        margin-top: 2px;
+
+        &.up {
+          color: $db-success;
+        }
+
+        &.down {
+          color: $db-danger;
+        }
+      }
+    }
+  }
+
+  .db-mini-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    & + .db-mini-title {
+      margin-top: 14px;
+    }
+
+    &::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      border-radius: 2px;
+      background: $db-primary;
+    }
+  }
+
+  .db-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .db-list-label {
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .db-list-value {
+      font-weight: 600;
+      font-size: 13px;
+    }
+  }
+
+  .db-progress-wrap {
+    margin-bottom: 8px;
+
+    .db-progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .db-progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+
+      .db-progress-inner {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #60a5fa, #3b82f6);
+      }
+    }
+  }
+
+  .db-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+
+    .rank-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: #e2e8f0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.top {
+        background: #fef3c7;
+        color: #d97706;
+      }
+    }
+
+    .rank-name {
+      flex: 1;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .rank-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+  }
+}

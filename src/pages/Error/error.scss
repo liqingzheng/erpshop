@@ -1,0 +1,143 @@
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+}
+
+/* 漂浮几何 */
+.shape {
+  position: absolute;
+  opacity: 0.15;
+  animation: floatShape 8s ease-in-out infinite;
+}
+.shape-1 {
+  width: 120px;
+  height: 120px;
+  border: 3px solid #00d2ff;
+  border-radius: 50%;
+  top: 15%;
+  left: 15%;
+  animation-delay: 0s;
+}
+.shape-2 {
+  width: 80px;
+  height: 80px;
+  border: 3px solid #ff00cc;
+  transform: rotate(45deg);
+  top: 60%;
+  left: 10%;
+  animation-delay: 2s;
+}
+.shape-3 {
+  width: 160px;
+  height: 160px;
+  border: 3px solid #faff00;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  top: 20%;
+  right: 10%;
+  animation-delay: 4s;
+}
+.shape-4 {
+  width: 60px;
+  height: 60px;
+  background: #00d2ff;
+  bottom: 20%;
+  right: 20%;
+  animation-delay: 1s;
+  border-radius: 50%;
+}
+
+@keyframes floatShape {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(10deg); }
+}
+
+/* 故障艺术数字 */
+.glitch {
+  font-size: 120px;
+  font-weight: 900;
+  color: #fff;
+  position: relative;
+  letter-spacing: 8px;
+  text-shadow:
+    2px 2px 0px #ff00cc,
+    -2px -2px 0px #00d2ff;
+  animation: glitchAnim 1.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitchAnim {
+  0% { text-shadow: 2px 2px 0px #ff00cc, -2px -2px 0px #00d2ff; transform: translate(0); }
+  20% { text-shadow: -2px 2px 0px #ff00cc, 2px -2px 0px #00d2ff; transform: translate(-2px, 2px); }
+  40% { text-shadow: 2px -2px 0px #ff00cc, -2px 2px 0px #00d2ff; transform: translate(2px, -2px); }
+  60% { text-shadow: -2px -2px 0px #ff00cc, 2px 2px 0px #00d2ff; transform: translate(-2px, -2px); }
+  80% { text-shadow: 2px 2px 0px #ff00cc, -2px -2px 0px #00d2ff; transform: translate(2px, 2px); }
+  100% { text-shadow: -2px 2px 0px #ff00cc, 2px -2px 0px #00d2ff; transform: translate(0); }
+}
+
+/* 内容卡片 */
+.error-content {
+  text-align: center;
+  z-index: 10;
+  color: #fff;
+  padding: 0 20px;
+}
+
+.error-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 20px 0 12px;
+  background: linear-gradient(90deg, #00d2ff, #ff00cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.error-desc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 32px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 霓虹按钮 */
+.neon-btn {
+  padding: 12px 36px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 2px solid #00d2ff;
+  color: #00d2ff;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+.neon-btn:hover {
+  color: #fff;
+  background: #00d2ff;
+  box-shadow: 0 0 20px #00d2ff, 0 0 40px #00d2ff;
+}
+
+/* 扫描线 */
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 210, 255, 0.3);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  0% { top: -4px; }
+  100% { top: 100%; }
+}
