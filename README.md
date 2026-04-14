@@ -1,2 +1,2 @@
 # my erpshop
-Vite+React+TypeScript+Zustand+Ant Design
+Vite+React+TypeScript+Zustand+Ant Design+Echarts
