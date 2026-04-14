@@ -83,7 +83,7 @@ export default function Inventory() {
             <Input.Search placeholder="仓库名称/编码" allowClear style={{ width: 260 }} />
             <Button type="primary">新增仓库</Button>
           </Space>
-          <Table columns={warehouseColumns} dataSource={data.warehouses} pagination={{ pageSize: 5 }} />
+          <Table columns={warehouseColumns} dataSource={data.warehouses} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="入库管理" key="2">
@@ -91,7 +91,7 @@ export default function Inventory() {
             <Input.Search placeholder="入库单号" allowClear style={{ width: 260 }} />
             <Button type="primary">新建入库单</Button>
           </Space>
-          <Table columns={inboundColumns} dataSource={data.inbounds} pagination={{ pageSize: 5 }} />
+          <Table columns={inboundColumns} dataSource={data.inbounds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="出库与库内作业" key="3">
@@ -101,7 +101,7 @@ export default function Inventory() {
             <Button>盘点任务</Button>
             <Button>移库</Button>
           </Space>
-          <Table columns={outboundColumns} dataSource={data.outbounds} pagination={{ pageSize: 5 }} />
+          <Table columns={outboundColumns} dataSource={data.outbounds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="库存监控与预警" key="4">
@@ -109,7 +109,7 @@ export default function Inventory() {
             <Input.Search placeholder="SKU编码" allowClear style={{ width: 260 }} />
             <Button type="primary">导出库存</Button>
           </Space>
-          <Table columns={inventoryColumns} dataSource={data.inventoryList} pagination={{ pageSize: 5 }} />
+          <Table columns={inventoryColumns} dataSource={data.inventoryList} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4 grid grid-cols-3 gap-4">
             <Card size="small" title="安全库存不足">
               <div className="text-red-500 text-2xl font-bold">{data.alerts?.safeStock}</div>

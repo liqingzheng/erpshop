@@ -92,7 +92,7 @@ export default function Order() {
             <Button type="primary">批量审单</Button>
             <Button>批量发货</Button>
           </Space>
-          <Table columns={orderColumns} dataSource={data.orders} pagination={{ pageSize: 5 }} />
+          <Table columns={orderColumns} dataSource={data.orders} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="售后管理" key="2">
@@ -100,7 +100,7 @@ export default function Order() {
             <Input.Search placeholder="售后单号/订单号" allowClear style={{ width: 260 }} />
             <Button type="primary">代客发起售后</Button>
           </Space>
-          <Table columns={refundColumns} dataSource={data.refunds} pagination={{ pageSize: 5 }} />
+          <Table columns={refundColumns} dataSource={data.refunds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="促销与价保" key="3">

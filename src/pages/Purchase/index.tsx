@@ -92,7 +92,7 @@ export default function Purchase() {
             <Input.Search placeholder="供应商名称/编码" allowClear style={{ width: 260 }} />
             <Button type="primary">新增供应商</Button>
           </Space>
-          <Table columns={supplierColumns} dataSource={data.suppliers} pagination={{ pageSize: 5 }} />
+          <Table columns={supplierColumns} dataSource={data.suppliers} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="采购计划与询比价" key="2">
@@ -105,7 +105,7 @@ export default function Purchase() {
             <Input.Search placeholder="采购单号" allowClear style={{ width: 260 }} />
             <Button type="primary">新建采购单</Button>
           </Space>
-          <Table columns={poColumns} dataSource={data.purchaseOrders} pagination={{ pageSize: 5 }} />
+          <Table columns={poColumns} dataSource={data.purchaseOrders} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4 font-bold">到货质检</div>
           <Table className="mt-2" columns={receiptColumns} dataSource={data.receipts} pagination={false} size="small" />
         </Tabs.TabPane>

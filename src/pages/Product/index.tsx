@@ -59,7 +59,7 @@ export default function Product() {
   const categoryColumns = [
     { title: '类目名称', dataIndex: 'name' },
     { title: '层级', dataIndex: 'level' },
-    { title: '下级类目', dataIndex: 'children' },
+    { title: '下级类目', render: (_: any, r: any) => r.children },
     { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('category', r)}>编辑</Button> },
   ]
 
@@ -113,7 +113,7 @@ export default function Product() {
             <Button type="primary">新增SPU</Button>
             <Button>批量导入</Button>
           </Space>
-          <Table columns={spuColumns} dataSource={spuData} pagination={{ pageSize: 5 }} />
+          <Table columns={spuColumns} dataSource={spuData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4">
             <h4 className="font-bold mb-2">SKU明细</h4>
             <Table columns={skuColumns} dataSource={skuData} pagination={{ pageSize: 5 }} size="small" />
@@ -122,9 +122,9 @@ export default function Product() {
 
         <Tabs.TabPane tab="类目与品牌" key="2">
           <div className="mb-4 font-bold">类目树</div>
-          <Table columns={categoryColumns} dataSource={categoryData} pagination={false} />
+          <Table columns={categoryColumns} dataSource={categoryData} pagination={false} childrenColumnName="subRows" />
           <div className="mt-6 mb-4 font-bold">品牌库</div>
-          <Table columns={brandColumns} dataSource={brandData} pagination={false} />
+          <Table columns={brandColumns} dataSource={brandData} pagination={false} childrenColumnName="subRows" />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="价格与刊登" key="3">

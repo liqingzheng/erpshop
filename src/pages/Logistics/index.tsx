@@ -71,7 +71,7 @@ export default function Logistics() {
             <Button type="primary">新增承运商</Button>
             <Button>运费模板配置</Button>
           </Space>
-          <Table columns={carrierColumns} dataSource={data.carriers} pagination={{ pageSize: 5 }} />
+          <Table columns={carrierColumns} dataSource={data.carriers} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="面单与发货" key="2">

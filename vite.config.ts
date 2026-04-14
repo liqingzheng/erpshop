@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    base: '/erpshop/',
     server: {
       port: 3000,
       open: true,

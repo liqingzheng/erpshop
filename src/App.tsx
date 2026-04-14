@@ -7,7 +7,7 @@ function App() {
   return (
     <ConfigProvider locale={zhCN} theme={{ token: { colorPrimary: '#1677ff' } }}>
       <AntApp>
-        <BrowserRouter>
+        <BrowserRouter basename="/erpshop">
           <AppRoutes />
         </BrowserRouter>
       </AntApp>

@@ -107,7 +107,7 @@ export default function DataCenter() {
             </Select>
             <Button type="primary">新建自定义报表</Button>
           </Space>
-          <Table columns={reportColumns} dataSource={reports} pagination={{ pageSize: 5 }} />
+          <Table columns={reportColumns} dataSource={reports} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="数据可视化" key="3">

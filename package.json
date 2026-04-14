@@ -11,7 +11,7 @@
     "build:uat": "tsc && vite build --mode uat",
     "build:prod": "tsc && vite build --mode prod",
     "build": "npm run build:prod",
-    "preview": "vite preview"
+    "preview": "vite preview --outDir dist-prod"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
