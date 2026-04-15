@@ -5,6 +5,10 @@ import inventoryMock from '../../../mock/inventory.json'
 export default function Inventory() {
   const [activeKey, setActiveKey] = useState('1')
   const [data, setData] = useState<any>(inventoryMock)
+  const [warehouseKeyword, setWarehouseKeyword] = useState('')
+  const [inboundKeyword, setInboundKeyword] = useState('')
+  const [outboundKeyword, setOutboundKeyword] = useState('')
+  const [inventoryKeyword, setInventoryKeyword] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'warehouse' | 'inbound' | 'outbound' | 'inventory'>('warehouse')
   const [editingRecord, setEditingRecord] = useState<any>(null)
@@ -75,41 +79,46 @@ export default function Inventory() {
     { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('outbound', r)}>编辑</Button> },
   ]
 
+  const warehouseData = (data.warehouses || []).filter((item: any) => !warehouseKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(warehouseKeyword.toLowerCase())))
+  const inboundData = (data.inbounds || []).filter((item: any) => !inboundKeyword || String(item.inNo || '').toLowerCase().includes(inboundKeyword.toLowerCase()))
+  const outboundData = (data.outbounds || []).filter((item: any) => !outboundKeyword || String(item.outNo || '').toLowerCase().includes(outboundKeyword.toLowerCase()))
+  const inventoryData = (data.inventoryList || []).filter((item: any) => !inventoryKeyword || String(item.skuCode || '').toLowerCase().includes(inventoryKeyword.toLowerCase()))
+
   return (
     <Card>
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         <Tabs.TabPane tab="仓库与库位" key="1">
           <Space className="mb-4">
-            <Input.Search placeholder="仓库名称/编码" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="仓库名称/编码" allowClear style={{ width: 260 }} value={warehouseKeyword} onChange={(e) => setWarehouseKeyword(e.target.value)} />
             <Button type="primary">新增仓库</Button>
           </Space>
-          <Table columns={warehouseColumns} dataSource={data.warehouses} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={warehouseColumns} dataSource={warehouseData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="入库管理" key="2">
           <Space className="mb-4">
-            <Input.Search placeholder="入库单号" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="入库单号" allowClear style={{ width: 260 }} value={inboundKeyword} onChange={(e) => setInboundKeyword(e.target.value)} />
             <Button type="primary">新建入库单</Button>
           </Space>
-          <Table columns={inboundColumns} dataSource={data.inbounds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={inboundColumns} dataSource={inboundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="出库与库内作业" key="3">
           <Space className="mb-4">
-            <Input.Search placeholder="出库单号" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="出库单号" allowClear style={{ width: 260 }} value={outboundKeyword} onChange={(e) => setOutboundKeyword(e.target.value)} />
             <Button type="primary">新建出库单</Button>
             <Button>盘点任务</Button>
             <Button>移库</Button>
           </Space>
-          <Table columns={outboundColumns} dataSource={data.outbounds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={outboundColumns} dataSource={outboundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="库存监控与预警" key="4">
           <Space className="mb-4">
-            <Input.Search placeholder="SKU编码" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="SKU编码" allowClear style={{ width: 260 }} value={inventoryKeyword} onChange={(e) => setInventoryKeyword(e.target.value)} />
             <Button type="primary">导出库存</Button>
           </Space>
-          <Table columns={inventoryColumns} dataSource={data.inventoryList} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={inventoryColumns} dataSource={inventoryData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4 grid grid-cols-3 gap-4">
             <Card size="small" title="安全库存不足">
               <div className="text-red-500 text-2xl font-bold">{data.alerts?.safeStock}</div>

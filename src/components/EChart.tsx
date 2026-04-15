@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { use, init, type EChartsCoreOption } from 'echarts/core'
-import { LineChart, BarChart, PieChart, FunnelChart, MapChart, ScatterChart } from 'echarts/charts'
+import { LineChart, BarChart, PieChart, FunnelChart, MapChart } from 'echarts/charts'
 import {
   GridComponent,
   TooltipComponent,
@@ -18,7 +18,6 @@ use([
   PieChart,
   FunnelChart,
   MapChart,
-  ScatterChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,
@@ -32,10 +31,9 @@ use([
 interface EChartProps {
   option: EChartsCoreOption
   style?: React.CSSProperties
-  onInit?: (chart: any) => void
 }
 
-export default function EChart({ option, style, onInit }: EChartProps) {
+export default function EChart({ option, style }: EChartProps) {
   const ref = useRef<HTMLDivElement>(null)
   const chartRef = useRef<any>(null)
 
@@ -43,7 +41,6 @@ export default function EChart({ option, style, onInit }: EChartProps) {
     if (!ref.current) return
     chartRef.current = init(ref.current)
     chartRef.current.setOption(option)
-    onInit?.(chartRef.current)
 
     const resizeObserver = new ResizeObserver(() => {
       chartRef.current?.resize()

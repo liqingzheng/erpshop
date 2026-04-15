@@ -7,6 +7,9 @@ const { Option } = Select
 export default function Logistics() {
   const [activeKey, setActiveKey] = useState('1')
   const [data, setData] = useState<any>(logisticsMock)
+  const [carrierKeyword, setCarrierKeyword] = useState('')
+  const [waybillKeyword, setWaybillKeyword] = useState('')
+  const [waybillCarrier, setWaybillCarrier] = useState<string | undefined>(undefined)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'carrier' | 'waybill' | 'exception'>('carrier')
   const [editingRecord, setEditingRecord] = useState<any>(null)
@@ -62,22 +65,29 @@ export default function Logistics() {
     { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('exception', r)}>编辑</Button><Button type="link">处理</Button></Space> },
   ]
 
+  const carrierData = (data.carriers || []).filter((item: any) => !carrierKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(carrierKeyword.toLowerCase())))
+  const waybillData = (data.waybills || []).filter((item: any) => {
+    const matchKeyword = !waybillKeyword || [item.waybillNo, item.orderNo].some((v) => String(v || '').toLowerCase().includes(waybillKeyword.toLowerCase()))
+    const matchCarrier = !waybillCarrier || waybillCarrier === 'all' || item.carrier === waybillCarrier || (waybillCarrier === 'SF' && item.carrier.includes('顺丰')) || (waybillCarrier === 'ZTO' && item.carrier.includes('中通'))
+    return matchKeyword && matchCarrier
+  })
+
   return (
     <Card>
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         <Tabs.TabPane tab="物流渠道与规则" key="1">
           <Space className="mb-4">
-            <Input.Search placeholder="承运商名称" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="承运商名称" allowClear style={{ width: 260 }} value={carrierKeyword} onChange={(e) => setCarrierKeyword(e.target.value)} />
             <Button type="primary">新增承运商</Button>
             <Button>运费模板配置</Button>
           </Space>
-          <Table columns={carrierColumns} dataSource={data.carriers} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={carrierColumns} dataSource={carrierData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="面单与发货" key="2">
           <Space className="mb-4">
-            <Input.Search placeholder="运单号/订单号" allowClear style={{ width: 260 }} />
-            <Select placeholder="承运商" allowClear style={{ width: 140 }}>
+            <Input.Search placeholder="运单号/订单号" allowClear style={{ width: 260 }} value={waybillKeyword} onChange={(e) => setWaybillKeyword(e.target.value)} />
+            <Select placeholder="承运商" allowClear style={{ width: 140 }} value={waybillCarrier} onChange={(v) => setWaybillCarrier(v)}>
               <Option value="all">全部</Option>
               <Option value="SF">顺丰</Option>
               <Option value="ZTO">中通</Option>
@@ -85,7 +95,7 @@ export default function Logistics() {
             <Button type="primary">批量取号</Button>
             <Button>批量打印</Button>
           </Space>
-          <Table columns={waybillColumns} dataSource={data.waybills} pagination={{ pageSize: 5 }} />
+          <Table columns={waybillColumns} dataSource={waybillData} pagination={{ pageSize: 5 }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="物流跟踪与异常" key="3">

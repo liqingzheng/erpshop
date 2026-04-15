@@ -7,9 +7,13 @@ const { Option } = Select
 export default function Product() {
   const [activeKey, setActiveKey] = useState('1')
   const [data, setData] = useState<any>(productMock)
+  const [spuKeyword, setSpuKeyword] = useState('')
+  const [spuStatus, setSpuStatus] = useState<string | undefined>(undefined)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'spu' | 'category' | 'brand' | 'price' | 'lifecycle'>('spu')
   const [editingRecord, setEditingRecord] = useState<any>(null)
+  const [detailRecord, setDetailRecord] = useState<any>(null)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [form] = Form.useForm()
 
   const openEdit = (type: typeof modalType, record: any) => {
@@ -44,7 +48,7 @@ export default function Product() {
     { title: '类目', dataIndex: 'category' },
     { title: '品牌', dataIndex: 'brand' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已上架' ? 'green' : s === '待审核' ? 'orange' : 'default'}>{s}</Tag> },
-    { title: '操作', key: 'action', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('spu', r)}>编辑</Button><Button type="link">详情</Button></Space> },
+    { title: '操作', key: 'action', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('spu', r)}>编辑</Button><Button type="link" onClick={() => { setDetailRecord(r); setIsDetailOpen(true) }}>详情</Button></Space> },
   ]
 
   const skuColumns = [
@@ -92,7 +96,11 @@ export default function Product() {
     { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('price', r)}>调价</Button> },
   ]
 
-  const spuData = data?.spuList || []
+  const spuData = (data?.spuList || []).filter((item: any) => {
+    const matchKeyword = !spuKeyword || [item.spuCode, item.title, item.skuCode].some((v) => String(v || '').toLowerCase().includes(spuKeyword.toLowerCase()))
+    const matchStatus = !spuStatus || spuStatus === 'all' || item.status.includes(spuStatus)
+    return matchKeyword && matchStatus
+  })
   const skuData = data?.skuList || []
   const categoryData = data?.categories || []
   const brandData = data?.brands || []
@@ -104,8 +112,8 @@ export default function Product() {
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         <Tabs.TabPane tab="产品资料库" key="1">
           <Space className="mb-4">
-            <Input.Search placeholder="搜索SPU/SKU/标题" allowClear style={{ width: 280 }} />
-            <Select placeholder="状态" allowClear style={{ width: 120 }}>
+            <Input.Search placeholder="搜索SPU/SKU/标题" allowClear style={{ width: 280 }} value={spuKeyword} onChange={(e) => setSpuKeyword(e.target.value)} />
+            <Select placeholder="状态" allowClear style={{ width: 120 }} value={spuStatus} onChange={(v) => setSpuStatus(v)}>
               <Option value="all">全部</Option>
               <Option value="上架">已上架</Option>
               <Option value="下架">已下架</Option>
@@ -135,6 +143,21 @@ export default function Product() {
           <Table columns={lifecycleColumns} dataSource={lifecycleData} pagination={false} />
         </Tabs.TabPane>
       </Tabs>
+
+      <Modal
+        title={detailRecord?.title || '详情'}
+        open={isDetailOpen}
+        onCancel={() => setIsDetailOpen(false)}
+        footer={[<Button key="close" onClick={() => setIsDetailOpen(false)}>关闭</Button>]}
+      >
+        <div className="py-4">
+          <p><b>SPU编码：</b>{detailRecord?.spuCode}</p>
+          <p><b>商品标题：</b>{detailRecord?.title}</p>
+          <p><b>类目：</b>{detailRecord?.category}</p>
+          <p><b>品牌：</b>{detailRecord?.brand}</p>
+          <p><b>状态：</b>{detailRecord?.status}</p>
+        </div>
+      </Modal>
 
       <Modal
         title="编辑"

@@ -9,6 +9,9 @@ const statusColors: any = { '待付款': 'default', '待审核': 'orange', '待�
 export default function Order() {
   const [activeKey, setActiveKey] = useState('1')
   const [data, setData] = useState<any>(orderMock)
+  const [orderKeyword, setOrderKeyword] = useState('')
+  const [orderStatus, setOrderStatus] = useState<string | undefined>(undefined)
+  const [refundKeyword, setRefundKeyword] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'order' | 'refund' | 'promo' | 'risk'>('order')
   const [editingRecord, setEditingRecord] = useState<any>(null)
@@ -76,13 +79,22 @@ export default function Order() {
     { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('risk', r)}>复核</Button><Button type="link">放行</Button></Space> },
   ]
 
+  const orderData = (data.orders || []).filter((item: any) => {
+    const matchKeyword = !orderKeyword || [item.orderNo, item.buyer].some((v) => String(v || '').toLowerCase().includes(orderKeyword.toLowerCase()))
+    const matchStatus = !orderStatus || orderStatus === 'all' || item.status === orderStatus
+    return matchKeyword && matchStatus
+  })
+  const refundData = (data.refunds || []).filter((item: any) => {
+    return !refundKeyword || [item.refundNo, item.orderNo].some((v) => String(v || '').toLowerCase().includes(refundKeyword.toLowerCase()))
+  })
+
   return (
     <Card>
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         <Tabs.TabPane tab={<span>订单中心 <Badge count={2} size="small" offset={[8, 0]} /></span>} key="1">
           <Space className="mb-4">
-            <Input.Search placeholder="订单号/买家昵称" allowClear style={{ width: 260 }} />
-            <Select placeholder="订单状态" allowClear style={{ width: 140 }}>
+            <Input.Search placeholder="订单号/买家昵称" allowClear style={{ width: 260 }} value={orderKeyword} onChange={(e) => setOrderKeyword(e.target.value)} />
+            <Select placeholder="订单状态" allowClear style={{ width: 140 }} value={orderStatus} onChange={(v) => setOrderStatus(v)}>
               <Option value="all">全部</Option>
               <Option value="待审核">待审核</Option>
               <Option value="待发货">待发货</Option>
@@ -92,15 +104,15 @@ export default function Order() {
             <Button type="primary">批量审单</Button>
             <Button>批量发货</Button>
           </Space>
-          <Table columns={orderColumns} dataSource={data.orders} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={orderColumns} dataSource={orderData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="售后管理" key="2">
           <Space className="mb-4">
-            <Input.Search placeholder="售后单号/订单号" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="售后单号/订单号" allowClear style={{ width: 260 }} value={refundKeyword} onChange={(e) => setRefundKeyword(e.target.value)} />
             <Button type="primary">代客发起售后</Button>
           </Space>
-          <Table columns={refundColumns} dataSource={data.refunds} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={refundColumns} dataSource={refundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="促销与价保" key="3">

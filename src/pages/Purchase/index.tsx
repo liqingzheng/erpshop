@@ -5,6 +5,8 @@ import purchaseMock from '../../../mock/purchase.json'
 export default function Purchase() {
   const [activeKey, setActiveKey] = useState('1')
   const [data, setData] = useState<any>(purchaseMock)
+  const [supplierKeyword, setSupplierKeyword] = useState('')
+  const [poKeyword, setPoKeyword] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'supplier' | 'po' | 'receipt' | 'statement'>('supplier')
   const [editingRecord, setEditingRecord] = useState<any>(null)
@@ -84,15 +86,18 @@ export default function Purchase() {
     { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('statement', r)}>编辑</Button> },
   ]
 
+  const supplierData = (data.suppliers || []).filter((item: any) => !supplierKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(supplierKeyword.toLowerCase())))
+  const poData = (data.purchaseOrders || []).filter((item: any) => !poKeyword || String(item.poNo || '').toLowerCase().includes(poKeyword.toLowerCase()))
+
   return (
     <Card>
       <Tabs activeKey={activeKey} onChange={setActiveKey}>
         <Tabs.TabPane tab="供应商管理" key="1">
           <Space className="mb-4">
-            <Input.Search placeholder="供应商名称/编码" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="供应商名称/编码" allowClear style={{ width: 260 }} value={supplierKeyword} onChange={(e) => setSupplierKeyword(e.target.value)} />
             <Button type="primary">新增供应商</Button>
           </Space>
-          <Table columns={supplierColumns} dataSource={data.suppliers} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={supplierColumns} dataSource={supplierData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="采购计划与询比价" key="2">
@@ -102,10 +107,10 @@ export default function Purchase() {
 
         <Tabs.TabPane tab="采购执行与到货" key="3">
           <Space className="mb-4">
-            <Input.Search placeholder="采购单号" allowClear style={{ width: 260 }} />
+            <Input.Search placeholder="采购单号" allowClear style={{ width: 260 }} value={poKeyword} onChange={(e) => setPoKeyword(e.target.value)} />
             <Button type="primary">新建采购单</Button>
           </Space>
-          <Table columns={poColumns} dataSource={data.purchaseOrders} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
+          <Table columns={poColumns} dataSource={poData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4 font-bold">到货质检</div>
           <Table className="mt-2" columns={receiptColumns} dataSource={data.receipts} pagination={false} size="small" />
         </Tabs.TabPane>
