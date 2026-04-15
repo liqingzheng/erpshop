@@ -1,5 +1,7 @@
 import { Row, Col, Card, Table, Tag, Button, List } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { registerMap } from 'echarts/core'
 import EChart from '@/components/EChart'
 import dashboardMock from '../../../mock/dashboard.json'
 import './dashboard.scss'
@@ -17,7 +19,147 @@ const kpiList = [
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { salesTrend, todayRealtime, categoryPie, profitPie, warehouseBar, todo, latestOrders, operations } = dashboardMock as any
+  const { salesTrend, todayRealtime, categoryPie, profitPie, warehouseBar, todo, latestOrders, operations, provinceSales } = dashboardMock as any
+  const [mapLoaded, setMapLoaded] = useState(false)
+
+  useEffect(() => {
+    fetch('/erpshop/china.geo.json')
+      .then((res) => res.json())
+      .then((geoJson) => {
+        registerMap('china', geoJson)
+        setMapLoaded(true)
+      })
+      .catch(() => {
+        // ignore map load error
+      })
+  }, [])
+
+  const provinceRegionMap: Record<string, string> = {
+    '黑龙江省': '东北区', '吉林省': '东北区', '辽宁省': '东北区',
+    '北京市': '华北区', '天津市': '华北区', '河北省': '华北区', '山西省': '华北区', '山东省': '华北区', '内蒙古自治区': '华北区',
+    '江苏省': '华东区', '安徽省': '华东区', '浙江省': '华东区', '上海市': '华东区', '江西省': '华东区', '福建省': '华东区', '台湾省': '华东区',
+    '河南省': '华中区', '湖北省': '华中区', '湖南省': '华中区',
+    '广东省': '华南区', '广西壮族自治区': '华南区', '海南省': '华南区', '香港特别行政区': '华南区', '澳门特别行政区': '华南区',
+    '陕西省': '西北区', '甘肃省': '西北区', '青海省': '西北区', '宁夏回族自治区': '西北区', '新疆维吾尔自治区': '西北区',
+    '四川省': '西南区', '重庆市': '西南区', '贵州省': '西南区', '云南省': '西南区', '西藏自治区': '西南区',
+  }
+
+  const sortedSales = [...(provinceSales || [])].sort((a: any, b: any) => a.value - b.value)
+  const barNames = sortedSales.map((d: any) => d.name)
+  const barValues = sortedSales.map((d: any) => d.value)
+  const barMax = Math.ceil(Math.max(...barValues, 1) / 10000) * 10000
+
+  const mapBarOption = {
+    tooltip: {
+      trigger: 'axis' as const,
+      axisPointer: { type: 'shadow' as const },
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      borderColor: '#e2e8f0',
+      textStyle: { color: '#1e293b' },
+      formatter: (params: any) => {
+        const p = Array.isArray(params) ? params[0] : params
+        return `${p.name}<br/>销售额：<b>¥ ${Number(p.value).toLocaleString()}</b>`
+      },
+    },
+    grid: {
+      left: '62%',
+      right: '4%',
+      top: '5%',
+      bottom: '5%',
+      containLabel: true,
+    },
+    geo: {
+      map: 'china',
+      roam: true,
+      zoom: 0.65,
+      center: ['50%', '60%'],
+      left: '1%',
+      width: '54%',
+      label: { show: false },
+      itemStyle: {
+        areaColor: '#e2e8f0',
+        borderColor: '#ffffff',
+        borderWidth: 1,
+      },
+      emphasis: {
+        itemStyle: {
+          areaColor: '#93c5fd',
+          borderColor: '#1e3a8a',
+          borderWidth: 1.5,
+        },
+      },
+    },
+    visualMap: {
+      min: 0,
+      max: barMax,
+      left: '1%',
+      bottom: '2%',
+      calculable: false,
+      show: false,
+      seriesIndex: 0,
+      inRange: {
+        color: ['#bfdbfe', '#60a5fa', '#2563eb', '#1e3a8a'],
+      },
+    },
+    xAxis: {
+      type: 'value' as const,
+      max: barMax,
+      interval: 10000,
+      splitLine: { lineStyle: { color: '#f1f5f9' } },
+      axisLabel: { 
+        color: '#64748b',
+        formatter: (v: number) => (v / 10000) + 'w',
+      },
+    },
+    yAxis: {
+      type: 'category' as const,
+      data: barNames,
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisLabel: { color: '#475569' },
+      axisTick: { alignWithLabel: true },
+    },
+    series: [
+      {
+        name: '区域分布',
+        type: 'map' as const,
+        geoIndex: 0,
+        data: (provinceSales || []).map((d: any) => {
+          const fullName = Object.keys(provinceRegionMap).find((k) => k.startsWith(d.name)) || d.name
+          return { name: fullName, value: d.value }
+        }),
+      },
+      {
+        name: '销售额',
+        type: 'bar' as const,
+        data: barValues,
+        barWidth: 10,
+        itemStyle: {
+          borderRadius: [0, 4, 4, 0],
+          color: (params: any) => {
+            const v = params.value
+            const ratio = barMax ? v / barMax : 0
+            if (ratio >= 0.75) return '#1e3a8a'
+            if (ratio >= 0.5) return '#2563eb'
+            if (ratio >= 0.25) return '#60a5fa'
+            return '#bfdbfe'
+          },
+        },
+        label: {
+          show: true,
+          position: 'insideRight' as const,
+          color: '#ffffff',
+          fontSize: 10,
+          fontWeight: 600,
+          textBorderColor: 'rgba(0,0,0,0.2)',
+          textBorderWidth: 1,
+          formatter: (params: any) => {
+            const v = params.value
+            return v >= 10000 ? (v / 10000).toFixed(1) + 'w' : String(v)
+          },
+        },
+      },
+    ],
+  }
 
   const salesOption = {
     tooltip: { trigger: 'axis' as const },
@@ -226,6 +368,17 @@ export default function Dashboard() {
           </Card>
         </Col>
       </Row>
+
+      {/* 销售区域分布 */}
+      {mapLoaded && (
+        <Row gutter={[16, 16]} className="db-section">
+          <Col xs={24}>
+            <Card title="销售区域分布" className="db-card h-full">
+              <EChart option={mapBarOption} style={{ height: 520 }} />
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       {/* 第二排 */}
       <Row gutter={[16, 16]} className="db-section">

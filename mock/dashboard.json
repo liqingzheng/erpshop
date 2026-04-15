@@ -54,6 +54,23 @@
     "returnRate": "2.1%",
     "roi": "4.8"
   },
+  "provinceSales": [
+    { "name": "广东", "value": 28450 },
+    { "name": "江苏", "value": 22100 },
+    { "name": "浙江", "value": 19800 },
+    { "name": "山东", "value": 16500 },
+    { "name": "河南", "value": 14200 },
+    { "name": "四川", "value": 12800 },
+    { "name": "湖北", "value": 10500 },
+    { "name": "湖南", "value": 9800 },
+    { "name": "福建", "value": 9200 },
+    { "name": "上海", "value": 15600 },
+    { "name": "北京", "value": 14300 },
+    { "name": "河北", "value": 8600 },
+    { "name": "安徽", "value": 7900 },
+    { "name": "陕西", "value": 6500 },
+    { "name": "云南", "value": 5200 }
+  ],
   "finance": {
     "grossProfit": "¥ 342,100",
     "ar": "¥ 128,400",
