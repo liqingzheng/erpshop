@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Select, Row, Col, Modal, Form, Input, message } from 'antd'
 import EChart from '@/components/EChart'
 import dataCenterMock from '../../../mock/dataCenter.json'
+import { useAuthStore } from '@/store/authStore'
 
 const { Option } = Select
 
@@ -12,6 +13,8 @@ export default function DataCenter() {
   const [modalType, setModalType] = useState<'etl' | 'report' | 'export'>('etl')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -20,17 +23,32 @@ export default function DataCenter() {
     setIsModalOpen(true)
   }
 
+  const openCreateReport = () => {
+    setModalType('report')
+    setEditingRecord(null)
+    form.resetFields()
+    setIsModalOpen(true)
+  }
+
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'etl') {
-      next.etlJobs = next.etlJobs.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.etlJobs = next.etlJobs.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     } else if (modalType === 'report') {
-      next.reports = next.reports.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.reports = next.reports.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.reports = [{ key: Date.now(), ...values }, ...next.reports]
+      }
     } else if (modalType === 'export') {
-      next.exports = next.exports.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.exports = next.exports.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     }
     setData(next)
-    message.success('保存成功')
+    message.info('仅作演示用，页面切换或刷新将会丢失')
     setIsModalOpen(false)
   }
 
@@ -40,7 +58,7 @@ export default function DataCenter() {
     { title: '更新周期', dataIndex: 'cycle' },
     { title: '最近更新', dataIndex: 'lastUpdate' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '正常' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('report', r)}>编辑</Button><Button type="link">导出</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('data:edit') && <Button type="link" onClick={() => openEdit('report', r)}>编辑</Button>}<Button type="link">导出</Button></Space> },
   ]
 
   const exportColumns = [
@@ -49,7 +67,7 @@ export default function DataCenter() {
     { title: '数据量', dataIndex: 'rows' },
     { title: '创建时间', dataIndex: 'createTime' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已完成' ? 'green' : 'blue'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('export', r)}>编辑</Button><Button type="link">下载</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('data:edit') && <Button type="link" onClick={() => openEdit('export', r)}>编辑</Button>}<Button type="link">下载</Button></Space> },
   ]
 
   const { etlJobs, reports, exports, funnel } = data
@@ -93,7 +111,7 @@ export default function DataCenter() {
             { title: '调度类型', dataIndex: 'schedule' },
             { title: '上次运行', dataIndex: 'lastRun' },
             { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '成功' ? 'green' : 'red'}>{s}</Tag> },
-            { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('etl', r)}>编辑</Button> },
+            { title: '操作', render: (_: any, r: any) => canEdit('data:edit') ? <Button type="link" onClick={() => openEdit('etl', r)}>编辑</Button> : null },
           ]} dataSource={etlJobs} pagination={false} />
         </Tabs.TabPane>
 
@@ -105,7 +123,7 @@ export default function DataCenter() {
               <Option value="inventory">库存报表</Option>
               <Option value="finance">财务报表</Option>
             </Select>
-            <Button type="primary">新建自定义报表</Button>
+            {canEdit('data:edit') && <Button type="primary" onClick={openCreateReport}>新建自定义报表</Button>}
           </Space>
           <Table columns={reportColumns} dataSource={reports} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -130,7 +148,7 @@ export default function DataCenter() {
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={editingRecord ? '编辑' : '新建自定义报表'} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'etl' && (
             <>
@@ -144,8 +162,19 @@ export default function DataCenter() {
           {modalType === 'report' && (
             <>
               <Form.Item label="报表名称" name="name" rules={[{ required: true }]}><Input /></Form.Item>
+              <Form.Item label="报表类型" name="type" rules={[{ required: true }]}>
+                <Select placeholder="请选择报表类型">
+                  <Option value="固定报表">固定报表</Option>
+                  <Option value="自定义报表">自定义报表</Option>
+                </Select>
+              </Form.Item>
               <Form.Item label="更新周期" name="cycle"><Input /></Form.Item>
-              <Form.Item label="状态" name="status"><Input /></Form.Item>
+              <Form.Item label="状态" name="status" rules={[{ required: true }]}>
+                <Select placeholder="请选择状态">
+                  <Option value="正常">正常</Option>
+                  <Option value="异常">异常</Option>
+                </Select>
+              </Form.Item>
             </>
           )}
           {modalType === 'export' && (

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Input, Select, Modal, Form, message } from 'antd'
 import logisticsMock from '../../../mock/logistics.json'
+import { useAuthStore } from '@/store/authStore'
 
 const { Option } = Select
 
@@ -14,6 +15,8 @@ export default function Logistics() {
   const [modalType, setModalType] = useState<'carrier' | 'waybill' | 'exception'>('carrier')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -22,10 +25,21 @@ export default function Logistics() {
     setIsModalOpen(true)
   }
 
+  const openAddCarrier = () => {
+    setModalType('carrier')
+    setEditingRecord(null)
+    form.resetFields()
+    setIsModalOpen(true)
+  }
+
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'carrier') {
-      next.carriers = next.carriers.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.carriers = next.carriers.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.carriers.unshift({ key: Date.now(), ...values })
+      }
     } else if (modalType === 'waybill') {
       next.waybills = next.waybills.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
     } else if (modalType === 'exception') {
@@ -33,6 +47,7 @@ export default function Logistics() {
     }
     setData(next)
     message.success('保存成功')
+    message.info('仅作演示用，页面切换或刷新将会丢失')
     setIsModalOpen(false)
   }
 
@@ -42,7 +57,7 @@ export default function Logistics() {
     { title: '结算方式', dataIndex: 'settlement' },
     { title: '服务范围', dataIndex: 'scope' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '启用' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('carrier', r)}>编辑</Button><Button type="link">运费模板</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('logistics:edit') && <><Button type="link" onClick={() => openEdit('carrier', r)}>编辑</Button><Button type="link">运费模板</Button></>}</Space> },
   ]
 
   const waybillColumns = [
@@ -52,7 +67,7 @@ export default function Logistics() {
     { title: '重量(kg)', dataIndex: 'weight' },
     { title: '运费', dataIndex: 'freight' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已签收' ? 'green' : s === '已发货' ? 'blue' : 'orange'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('waybill', r)}>编辑</Button><Button type="link">打印</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('logistics:edit') && <><Button type="link" onClick={() => openEdit('waybill', r)}>编辑</Button><Button type="link">打印</Button></>}</Space> },
   ]
 
   const exceptionColumns = [
@@ -62,7 +77,7 @@ export default function Logistics() {
     { title: '描述', dataIndex: 'desc' },
     { title: '处理人', dataIndex: 'handler' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '待处理' ? 'red' : 'green'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('exception', r)}>编辑</Button><Button type="link">处理</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('logistics:edit') && <><Button type="link" onClick={() => openEdit('exception', r)}>编辑</Button><Button type="link">处理</Button></>}</Space> },
   ]
 
   const carrierData = (data.carriers || []).filter((item: any) => !carrierKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(carrierKeyword.toLowerCase())))
@@ -78,8 +93,7 @@ export default function Logistics() {
         <Tabs.TabPane tab="物流渠道与规则" key="1">
           <Space className="mb-4">
             <Input.Search placeholder="承运商名称" allowClear style={{ width: 260 }} value={carrierKeyword} onChange={(e) => setCarrierKeyword(e.target.value)} />
-            <Button type="primary">新增承运商</Button>
-            <Button>运费模板配置</Button>
+            {canEdit('logistics:edit') && <><Button type="primary" onClick={openAddCarrier}>新增承运商</Button><Button>运费模板配置</Button></>}
           </Space>
           <Table columns={carrierColumns} dataSource={carrierData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -92,15 +106,14 @@ export default function Logistics() {
               <Option value="SF">顺丰</Option>
               <Option value="ZTO">中通</Option>
             </Select>
-            <Button type="primary">批量取号</Button>
-            <Button>批量打印</Button>
+            {canEdit('logistics:edit') && <><Button type="primary">批量取号</Button><Button>批量打印</Button></>}
           </Space>
           <Table columns={waybillColumns} dataSource={waybillData} pagination={{ pageSize: 5 }} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="物流跟踪与异常" key="3">
           <Space className="mb-4">
-            <Button type="primary">刷新轨迹</Button>
+            {canEdit('logistics:edit') && <Button type="primary">刷新轨迹</Button>}
           </Space>
           <Table columns={exceptionColumns} dataSource={data.exceptions} pagination={{ pageSize: 5 }} />
         </Tabs.TabPane>
@@ -110,7 +123,7 @@ export default function Logistics() {
             <Card size="small" title="波次拣货">
               <div className="text-gray-600">当前待拣货波次：<span className="text-blue-600 font-bold">{data.warehouseStats.wavePending}</span></div>
               <div className="text-gray-600 mt-2">已完成的波次：<span className="text-green-600 font-bold">{data.warehouseStats.waveDone}</span></div>
-              <Button className="mt-3" type="primary" size="small">生成波次</Button>
+              {canEdit('logistics:edit') && <Button className="mt-3" type="primary" size="small">生成波次</Button>}
             </Card>
             <Card size="small" title="拣货路径">
               <div className="text-gray-600">今日平均拣货时长：<span className="text-blue-600 font-bold">{data.warehouseStats.avgPickTime}</span></div>
@@ -129,10 +142,11 @@ export default function Logistics() {
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={editingRecord ? '编辑' : '新增承运商'} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'carrier' && (
             <>
+              <Form.Item label="承运商编码" name="code" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="承运商名称" name="name" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="结算方式" name="settlement"><Input /></Form.Item>
               <Form.Item label="服务范围" name="scope"><Input /></Form.Item>

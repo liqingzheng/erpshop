@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Input, Select, Badge, Modal, Form, message } from 'antd'
 import orderMock from '../../../mock/order.json'
+import { useAuthStore } from '@/store/authStore'
 
 const { Option } = Select
 
@@ -16,6 +17,8 @@ export default function Order() {
   const [modalType, setModalType] = useState<'order' | 'refund' | 'promo' | 'risk'>('order')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -27,13 +30,30 @@ export default function Order() {
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'order') {
-      next.orders = next.orders.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.orders = next.orders.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.orders = [{ key: Date.now(), ...values }, ...next.orders]
+      }
     } else if (modalType === 'refund') {
-      next.refunds = next.refunds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.refunds = next.refunds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.refunds = [{ key: Date.now(), ...values }, ...next.refunds]
+        message.info('仅作演示用，页面切换或刷新将会丢失')
+      }
     } else if (modalType === 'promo') {
-      next.promotions = next.promotions.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.promotions = next.promotions.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.promotions = [{ key: Date.now(), ...values }, ...next.promotions]
+      }
     } else if (modalType === 'risk') {
-      next.risks = next.risks.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.risks = next.risks.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.risks = [{ key: Date.now(), ...values }, ...next.risks]
+      }
     }
     setData(next)
     message.success('保存成功')
@@ -48,7 +68,7 @@ export default function Order() {
     { title: '实付金额', dataIndex: 'payAmount' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Badge status={statusColors[s] === 'default' ? 'default' : 'processing'} color={statusColors[s] === 'default' ? '#d9d9d9' : undefined} text={<Tag color={statusColors[s]}>{s}</Tag>} /> },
     { title: '下单时间', dataIndex: 'time' },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('order', r)}>编辑</Button><Button type="link">发货</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('order:edit') && <><Button type="link" onClick={() => openEdit('order', r)}>编辑</Button><Button type="link">发货</Button></>}</Space> },
   ]
 
   const refundColumns = [
@@ -58,7 +78,7 @@ export default function Order() {
     { title: '退款金额', dataIndex: 'amount' },
     { title: '原因', dataIndex: 'reason' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '待审核' ? 'orange' : s === '已退款' ? 'green' : 'blue'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('refund', r)}>处理</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('order:edit') ? <Button type="link" onClick={() => openEdit('refund', r)}>处理</Button> : null },
   ]
 
   const promoColumns = [
@@ -67,7 +87,7 @@ export default function Order() {
     { title: '优惠金额', dataIndex: 'discount' },
     { title: '赠品', dataIndex: 'gift' },
     { title: '价保状态', dataIndex: 'priceProtect', render: (s: string) => <Tag color={s === '已价保' ? 'green' : 'default'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('promo', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('order:edit') ? <Button type="link" onClick={() => openEdit('promo', r)}>编辑</Button> : null },
   ]
 
   const riskColumns = [
@@ -76,7 +96,7 @@ export default function Order() {
     { title: '风险评分', dataIndex: 'score' },
     { title: '命中规则', dataIndex: 'rule' },
     { title: '处理状态', dataIndex: 'handle', render: (s: string) => <Tag color={s === '已拦截' ? 'red' : 'green'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('risk', r)}>复核</Button><Button type="link">放行</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('order:edit') && <><Button type="link" onClick={() => openEdit('risk', r)}>复核</Button><Button type="link">放行</Button></>}</Space> },
   ]
 
   const orderData = (data.orders || []).filter((item: any) => {
@@ -101,8 +121,7 @@ export default function Order() {
               <Option value="已发货">已发货</Option>
               <Option value="售后中">售后中</Option>
             </Select>
-            <Button type="primary">批量审单</Button>
-            <Button>批量发货</Button>
+            {canEdit('order:edit') && <><Button type="primary">批量审单</Button><Button>批量发货</Button></>}
           </Space>
           <Table columns={orderColumns} dataSource={orderData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -110,7 +129,7 @@ export default function Order() {
         <Tabs.TabPane tab="售后管理" key="2">
           <Space className="mb-4">
             <Input.Search placeholder="售后单号/订单号" allowClear style={{ width: 260 }} value={refundKeyword} onChange={(e) => setRefundKeyword(e.target.value)} />
-            <Button type="primary">代客发起售后</Button>
+            {canEdit('order:edit') && <Button type="primary" onClick={() => { setModalType('refund'); setEditingRecord(null); form.resetFields(); setIsModalOpen(true) }}>代客发起售后</Button>}
           </Space>
           <Table columns={refundColumns} dataSource={refundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -124,7 +143,7 @@ export default function Order() {
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={editingRecord ? '编辑' : modalType === 'refund' ? '代客发起售后' : '编辑'} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'order' && (
             <>
@@ -138,6 +157,8 @@ export default function Order() {
           )}
           {modalType === 'refund' && (
             <>
+              <Form.Item label="售后单号" name="refundNo"><Input /></Form.Item>
+              <Form.Item label="关联订单" name="orderNo"><Input /></Form.Item>
               <Form.Item label="售后类型" name="type"><Input /></Form.Item>
               <Form.Item label="退款金额" name="amount"><Input /></Form.Item>
               <Form.Item label="原因" name="reason"><Input /></Form.Item>

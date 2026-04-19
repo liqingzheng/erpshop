@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import usersMock from '../../mock/users.json'
 
 interface UserInfo {
   id: string
@@ -45,29 +46,51 @@ export const useAuthStore = create<AuthState>()(
             },
             isLoggedIn: true,
           })
-        } else {
+          return
+        }
+
+        const mockUser = (usersMock as any).users.find((u: any) => u.username === username)
+        if (mockUser) {
+          if (mockUser.status === '停用') {
+            throw new Error('账号已停用')
+          }
+          const roleObj = (usersMock as any).roles.find((r: any) => r.key === mockUser.role)
           set({
             token: 'mock_token_' + username + '_' + Date.now(),
             userInfo: {
-              id: '2',
-              username,
-              nickname: username === 'operator' ? '运营专员' : '普通用户',
-              phone: '13900139000',
-              role: 'operator',
-              permissions: [
-                'product:view', 'product:edit',
-                'order:view', 'order:edit',
-                'purchase:view',
-                'inventory:view', 'inventory:edit',
-                'data:view',
-                'finance:view',
-                'logistics:view',
-                'dashboard:view',
-              ],
+              id: mockUser.id,
+              username: mockUser.username,
+              nickname: mockUser.nickname,
+              phone: mockUser.phone,
+              role: mockUser.role,
+              permissions: roleObj?.permissions || mockUser.permissions || [],
             },
             isLoggedIn: true,
           })
+          return
         }
+
+        set({
+          token: 'mock_token_' + username + '_' + Date.now(),
+          userInfo: {
+            id: '2',
+            username,
+            nickname: username === 'operator' ? '运营专员' : '普通用户',
+            phone: '13900139000',
+            role: 'operator',
+            permissions: [
+              'product:view', 'product:edit',
+              'order:view', 'order:edit',
+              'purchase:view',
+              'inventory:view', 'inventory:edit',
+              'data:view',
+              'finance:view',
+              'logistics:view',
+              'dashboard:view',
+            ],
+          },
+          isLoggedIn: true,
+        })
       },
       logout: () => {
         set({ token: null, userInfo: null, isLoggedIn: false })

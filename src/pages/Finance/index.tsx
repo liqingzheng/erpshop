@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Statistic, Row, Col, Modal, Form, Input, message } from 'antd'
 import financeMock from '../../../mock/finance.json'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Finance() {
   const [activeKey, setActiveKey] = useState('1')
@@ -9,11 +10,20 @@ export default function Finance() {
   const [modalType, setModalType] = useState<'ar' | 'ap' | 'cost' | 'profit' | 'fund'>('ar')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
     setEditingRecord(record)
     form.setFieldsValue({ ...record })
+    setIsModalOpen(true)
+  }
+
+  const openAdd = () => {
+    setModalType('fund')
+    setEditingRecord(null)
+    form.resetFields()
     setIsModalOpen(true)
   }
 
@@ -28,10 +38,15 @@ export default function Finance() {
     } else if (modalType === 'profit') {
       next.profitList = next.profitList.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
     } else if (modalType === 'fund') {
-      next.fundFlows = next.fundFlows.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.fundFlows = next.fundFlows.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.fundFlows.unshift({ key: Date.now(), ...values })
+      }
     }
     setData(next)
     message.success('保存成功')
+    message.info('仅作演示用，页面切换或刷新将会丢失')
     setIsModalOpen(false)
   }
 
@@ -43,7 +58,7 @@ export default function Finance() {
     { title: '未收余额', dataIndex: 'balance' },
     { title: '账龄(天)', dataIndex: 'aging' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已结清' ? 'green' : 'orange'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('ar', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('finance:edit') ? <Button type="link" onClick={() => openEdit('ar', r)}>编辑</Button> : null },
   ]
 
   const apColumns = [
@@ -54,7 +69,7 @@ export default function Finance() {
     { title: '未付余额', dataIndex: 'balance' },
     { title: '到期日', dataIndex: 'dueDate' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已付清' ? 'green' : 'orange'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('ap', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('finance:edit') ? <Button type="link" onClick={() => openEdit('ap', r)}>编辑</Button> : null },
   ]
 
   const costColumns = [
@@ -65,7 +80,7 @@ export default function Finance() {
     { title: '平台佣金', dataIndex: 'commission' },
     { title: '推广费分摊', dataIndex: 'ad' },
     { title: '综合成本', dataIndex: 'total' },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('cost', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('finance:edit') ? <Button type="link" onClick={() => openEdit('cost', r)}>编辑</Button> : null },
   ]
 
   const profitColumns = [
@@ -75,7 +90,7 @@ export default function Finance() {
     { title: '费用', dataIndex: 'expense' },
     { title: '毛利', dataIndex: 'gross' },
     { title: '毛利率', dataIndex: 'grossRate' },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('profit', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('finance:edit') ? <Button type="link" onClick={() => openEdit('profit', r)}>编辑</Button> : null },
   ]
 
   const fundColumns = [
@@ -86,7 +101,7 @@ export default function Finance() {
     { title: '余额', dataIndex: 'balance' },
     { title: '交易时间', dataIndex: 'time' },
     { title: '备注', dataIndex: 'remark' },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('fund', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('finance:edit') ? <Button type="link" onClick={() => openEdit('fund', r)}>编辑</Button> : null },
   ]
 
   return (
@@ -120,14 +135,13 @@ export default function Finance() {
 
         <Tabs.TabPane tab="资金与票据" key="4">
           <Space className="mb-4">
-            <Button type="primary">新增付款申请</Button>
-            <Button>发票验真</Button>
+            {canEdit('finance:edit') && <><Button type="primary" onClick={openAdd}>新增付款申请</Button><Button>发票验真</Button></>}
           </Space>
           <Table columns={fundColumns} dataSource={data.fundFlows} pagination={{ pageSize: 5 }} />
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={editingRecord ? '编辑' : '新增付款申请'} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'ar' && (
             <>
@@ -168,10 +182,12 @@ export default function Finance() {
           )}
           {modalType === 'fund' && (
             <>
+              <Form.Item label="流水号" name="flowNo"><Input /></Form.Item>
               <Form.Item label="账户" name="account"><Input /></Form.Item>
               <Form.Item label="收支类型" name="type"><Input /></Form.Item>
               <Form.Item label="金额" name="amount"><Input /></Form.Item>
               <Form.Item label="余额" name="balance"><Input /></Form.Item>
+              <Form.Item label="交易时间" name="time"><Input /></Form.Item>
               <Form.Item label="备注" name="remark"><Input /></Form.Item>
             </>
           )}

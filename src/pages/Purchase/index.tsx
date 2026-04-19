@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Card, Tabs, Table, Tag, Button, Space, Input, Progress, Modal, Form, message } from 'antd'
+import { Card, Tabs, Table, Tag, Button, Space, Input, Progress, Modal, Form, message, Select } from 'antd'
 import purchaseMock from '../../../mock/purchase.json'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Purchase() {
   const [activeKey, setActiveKey] = useState('1')
@@ -11,6 +12,15 @@ export default function Purchase() {
   const [modalType, setModalType] = useState<'supplier' | 'po' | 'receipt' | 'statement'>('supplier')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
+
+  const openAdd = (type: typeof modalType) => {
+    setModalType(type)
+    setEditingRecord(null)
+    form.resetFields()
+    setIsModalOpen(true)
+  }
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -22,17 +32,41 @@ export default function Purchase() {
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'supplier') {
-      next.suppliers = next.suppliers.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord == null) {
+        next.suppliers = [{ key: String(Date.now()), ...values }, ...next.suppliers]
+      } else {
+        next.suppliers = next.suppliers.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     } else if (modalType === 'po') {
-      next.purchaseOrders = next.purchaseOrders.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord == null) {
+        next.purchaseOrders = [{ key: String(Date.now()), progress: 0, ...values }, ...next.purchaseOrders]
+      } else {
+        next.purchaseOrders = next.purchaseOrders.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     } else if (modalType === 'receipt') {
-      next.receipts = next.receipts.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord == null) {
+        next.receipts = [{ key: String(Date.now()), ...values }, ...next.receipts]
+      } else {
+        next.receipts = next.receipts.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     } else if (modalType === 'statement') {
-      next.statements = next.statements.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord == null) {
+        next.statements = [{ key: String(Date.now()), ...values }, ...next.statements]
+      } else {
+        next.statements = next.statements.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      }
     }
     setData(next)
     message.success('保存成功')
+    message.info('仅作演示用，页面切换或刷新将会丢失')
     setIsModalOpen(false)
+  }
+
+  const getModalTitle = () => {
+    if (editingRecord) return '编辑'
+    if (modalType === 'supplier') return '新增供应商'
+    if (modalType === 'po') return '新建采购单'
+    return '编辑'
   }
 
   const supplierColumns = [
@@ -42,7 +76,7 @@ export default function Purchase() {
     { title: '结算方式', dataIndex: 'settlement' },
     { title: '评级', dataIndex: 'rating', render: (r: string) => <Tag color={r === 'S' ? 'gold' : r === 'A' ? 'green' : 'default'}>{r}级</Tag> },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '正常' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('supplier', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('purchase:edit') ? <Button type="link" onClick={() => openEdit('supplier', r)}>编辑</Button> : null },
   ]
 
   const poColumns = [
@@ -52,7 +86,7 @@ export default function Purchase() {
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '全部到货' ? 'green' : s === '待审核' ? 'orange' : 'blue'}>{s}</Tag> },
     { title: '到货进度', dataIndex: 'progress', render: (p: number) => <Progress percent={p} size="small" /> },
     { title: '下单日期', dataIndex: 'date' },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('po', r)}>编辑</Button><Button type="link">详情</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('purchase:edit') && <Button type="link" onClick={() => openEdit('po', r)}>编辑</Button>}<Button type="link">详情</Button></Space> },
   ]
 
   const receiptColumns = [
@@ -62,7 +96,7 @@ export default function Purchase() {
     { title: '合格数量', dataIndex: 'passQty' },
     { title: '不合格数量', dataIndex: 'rejectQty' },
     { title: '质检结果', dataIndex: 'result', render: (s: string) => <Tag color={s === '合格' ? 'green' : s === '让步接收' ? 'orange' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('receipt', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('purchase:edit') ? <Button type="link" onClick={() => openEdit('receipt', r)}>编辑</Button> : null },
   ]
 
   const suggestColumns = [
@@ -73,7 +107,7 @@ export default function Purchase() {
     { title: '在途库存', dataIndex: 'inTransit' },
     { title: '建议采购量', dataIndex: 'suggest' },
     { title: '推荐供应商', dataIndex: 'supplier' },
-    { title: '操作', render: () => <Button type="primary" size="small">生成PR</Button> },
+    { title: '操作', render: () => canEdit('purchase:edit') ? <Button type="primary" size="small">生成PR</Button> : null },
   ]
 
   const statementColumns = [
@@ -83,7 +117,7 @@ export default function Purchase() {
     { title: '已付金额', dataIndex: 'paid' },
     { title: '未付余额', dataIndex: 'balance' },
     { title: '对账状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已确认' ? 'green' : 'orange'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('statement', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('purchase:edit') ? <Button type="link" onClick={() => openEdit('statement', r)}>编辑</Button> : null },
   ]
 
   const supplierData = (data.suppliers || []).filter((item: any) => !supplierKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(supplierKeyword.toLowerCase())))
@@ -95,7 +129,7 @@ export default function Purchase() {
         <Tabs.TabPane tab="供应商管理" key="1">
           <Space className="mb-4">
             <Input.Search placeholder="供应商名称/编码" allowClear style={{ width: 260 }} value={supplierKeyword} onChange={(e) => setSupplierKeyword(e.target.value)} />
-            <Button type="primary">新增供应商</Button>
+            {canEdit('purchase:edit') && <Button type="primary" onClick={() => openAdd('supplier')}>新增供应商</Button>}
           </Space>
           <Table columns={supplierColumns} dataSource={supplierData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -108,7 +142,7 @@ export default function Purchase() {
         <Tabs.TabPane tab="采购执行与到货" key="3">
           <Space className="mb-4">
             <Input.Search placeholder="采购单号" allowClear style={{ width: 260 }} value={poKeyword} onChange={(e) => setPoKeyword(e.target.value)} />
-            <Button type="primary">新建采购单</Button>
+            {canEdit('purchase:edit') && <Button type="primary" onClick={() => openAdd('po')}>新建采购单</Button>}
           </Space>
           <Table columns={poColumns} dataSource={poData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4 font-bold">到货质检</div>
@@ -120,21 +154,28 @@ export default function Purchase() {
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={getModalTitle()} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'supplier' && (
             <>
+              <Form.Item label="供应商编码" name="code" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="供应商名称" name="name" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="联系人" name="contact"><Input /></Form.Item>
               <Form.Item label="结算方式" name="settlement"><Input /></Form.Item>
-              <Form.Item label="评级" name="rating"><Input /></Form.Item>
+              <Form.Item label="评级" name="rating">
+                <Select placeholder="请选择评级" options={[{ label: 'S', value: 'S' }, { label: 'A', value: 'A' }, { label: 'B', value: 'B' }, { label: 'C', value: 'C' }]} />
+              </Form.Item>
               <Form.Item label="状态" name="status"><Input /></Form.Item>
             </>
           )}
           {modalType === 'po' && (
             <>
+              <Form.Item label="采购单号" name="poNo" rules={[{ required: true }]}><Input /></Form.Item>
+              <Form.Item label="供应商" name="supplier" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="采购金额" name="amount"><Input /></Form.Item>
-              <Form.Item label="状态" name="status"><Input /></Form.Item>
+              <Form.Item label="状态" name="status">
+                <Select placeholder="请选择状态" options={[{ label: '待审核', value: '待审核' }, { label: '部分到货', value: '部分到货' }, { label: '全部到货', value: '全部到货' }]} />
+              </Form.Item>
               <Form.Item label="下单日期" name="date"><Input /></Form.Item>
             </>
           )}

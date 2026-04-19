@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Input, Modal, Form, message } from 'antd'
 import inventoryMock from '../../../mock/inventory.json'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Inventory() {
   const [activeKey, setActiveKey] = useState('1')
@@ -13,6 +14,15 @@ export default function Inventory() {
   const [modalType, setModalType] = useState<'warehouse' | 'inbound' | 'outbound' | 'inventory'>('warehouse')
   const [editingRecord, setEditingRecord] = useState<any>(null)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
+
+  const openAdd = (type: typeof modalType) => {
+    setModalType(type)
+    setEditingRecord(null)
+    form.resetFields()
+    setIsModalOpen(true)
+  }
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -21,19 +31,44 @@ export default function Inventory() {
     setIsModalOpen(true)
   }
 
+  const getModalTitle = () => {
+    if (editingRecord) return '编辑'
+    if (modalType === 'warehouse') return '新增仓库'
+    if (modalType === 'inbound') return '新建入库单'
+    if (modalType === 'outbound') return '新建出库单'
+    return '编辑'
+  }
+
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'warehouse') {
-      next.warehouses = next.warehouses.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.warehouses = next.warehouses.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.warehouses = [{ key: Date.now(), ...values }, ...next.warehouses]
+      }
     } else if (modalType === 'inbound') {
-      next.inbounds = next.inbounds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.inbounds = next.inbounds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.inbounds = [{ key: Date.now(), ...values }, ...next.inbounds]
+      }
     } else if (modalType === 'outbound') {
-      next.outbounds = next.outbounds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.outbounds = next.outbounds.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.outbounds = [{ key: Date.now(), ...values }, ...next.outbounds]
+      }
     } else if (modalType === 'inventory') {
-      next.inventoryList = next.inventoryList.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord) {
+        next.inventoryList = next.inventoryList.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      } else {
+        next.inventoryList = [{ key: Date.now(), ...values }, ...next.inventoryList]
+      }
     }
     setData(next)
     message.success('保存成功')
+    message.info('仅作演示用，页面切换或刷新将会丢失')
     setIsModalOpen(false)
   }
 
@@ -44,7 +79,7 @@ export default function Inventory() {
     { title: '地址', dataIndex: 'address' },
     { title: '面积(m²)', dataIndex: 'area' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '启用' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('warehouse', r)}>编辑</Button><Button type="link">库位管理</Button></Space> },
+    { title: '操作', render: (_: any, r: any) => <Space>{canEdit('inventory:edit') && <><Button type="link" onClick={() => openEdit('warehouse', r)}>编辑</Button><Button type="link">库位管理</Button></>}</Space> },
   ]
 
   const inventoryColumns = [
@@ -56,7 +91,7 @@ export default function Inventory() {
     { title: '在途库存', dataIndex: 'inTransit' },
     { title: '冻结库存', dataIndex: 'frozen' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '正常' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('inventory', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('inventory:edit') ? <Button type="link" onClick={() => openEdit('inventory', r)}>编辑</Button> : null },
   ]
 
   const inboundColumns = [
@@ -66,7 +101,7 @@ export default function Inventory() {
     { title: 'SKU数', dataIndex: 'skuCount' },
     { title: '总数量', dataIndex: 'qty' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已完成' ? 'green' : 'blue'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('inbound', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('inventory:edit') ? <Button type="link" onClick={() => openEdit('inbound', r)}>编辑</Button> : null },
   ]
 
   const outboundColumns = [
@@ -76,7 +111,7 @@ export default function Inventory() {
     { title: 'SKU数', dataIndex: 'skuCount' },
     { title: '总数量', dataIndex: 'qty' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已出库' ? 'green' : 'blue'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('outbound', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('inventory:edit') ? <Button type="link" onClick={() => openEdit('outbound', r)}>编辑</Button> : null },
   ]
 
   const warehouseData = (data.warehouses || []).filter((item: any) => !warehouseKeyword || [item.code, item.name].some((v) => String(v || '').toLowerCase().includes(warehouseKeyword.toLowerCase())))
@@ -90,7 +125,7 @@ export default function Inventory() {
         <Tabs.TabPane tab="仓库与库位" key="1">
           <Space className="mb-4">
             <Input.Search placeholder="仓库名称/编码" allowClear style={{ width: 260 }} value={warehouseKeyword} onChange={(e) => setWarehouseKeyword(e.target.value)} />
-            <Button type="primary">新增仓库</Button>
+            {canEdit('inventory:edit') && <Button type="primary" onClick={() => openAdd('warehouse')}>新增仓库</Button>}
           </Space>
           <Table columns={warehouseColumns} dataSource={warehouseData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -98,7 +133,7 @@ export default function Inventory() {
         <Tabs.TabPane tab="入库管理" key="2">
           <Space className="mb-4">
             <Input.Search placeholder="入库单号" allowClear style={{ width: 260 }} value={inboundKeyword} onChange={(e) => setInboundKeyword(e.target.value)} />
-            <Button type="primary">新建入库单</Button>
+            {canEdit('inventory:edit') && <Button type="primary" onClick={() => openAdd('inbound')}>新建入库单</Button>}
           </Space>
           <Table columns={inboundColumns} dataSource={inboundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -106,9 +141,7 @@ export default function Inventory() {
         <Tabs.TabPane tab="出库与库内作业" key="3">
           <Space className="mb-4">
             <Input.Search placeholder="出库单号" allowClear style={{ width: 260 }} value={outboundKeyword} onChange={(e) => setOutboundKeyword(e.target.value)} />
-            <Button type="primary">新建出库单</Button>
-            <Button>盘点任务</Button>
-            <Button>移库</Button>
+            {canEdit('inventory:edit') && <><Button type="primary" onClick={() => openAdd('outbound')}>新建出库单</Button><Button>盘点任务</Button><Button>移库</Button></>}
           </Space>
           <Table columns={outboundColumns} dataSource={outboundData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
         </Tabs.TabPane>
@@ -136,10 +169,11 @@ export default function Inventory() {
         </Tabs.TabPane>
       </Tabs>
 
-      <Modal title="编辑" open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
+      <Modal title={getModalTitle()} open={isModalOpen} onOk={() => form.submit()} onCancel={() => setIsModalOpen(false)} destroyOnClose>
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'warehouse' && (
             <>
+              <Form.Item label="仓库编码" name="code" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="仓库名称" name="name" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="类型" name="type"><Input /></Form.Item>
               <Form.Item label="地址" name="address"><Input /></Form.Item>
@@ -149,6 +183,7 @@ export default function Inventory() {
           )}
           {modalType === 'inbound' && (
             <>
+              <Form.Item label="入库单号" name="inNo" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="业务类型" name="type"><Input /></Form.Item>
               <Form.Item label="仓库" name="warehouse"><Input /></Form.Item>
               <Form.Item label="SKU数" name="skuCount"><Input type="number" /></Form.Item>
@@ -158,6 +193,7 @@ export default function Inventory() {
           )}
           {modalType === 'outbound' && (
             <>
+              <Form.Item label="出库单号" name="outNo" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="业务类型" name="type"><Input /></Form.Item>
               <Form.Item label="仓库" name="warehouse"><Input /></Form.Item>
               <Form.Item label="SKU数" name="skuCount"><Input type="number" /></Form.Item>

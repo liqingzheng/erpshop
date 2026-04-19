@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Tabs, Table, Tag, Button, Space, Input, Select, Image, Modal, Form, message } from 'antd'
 import productMock from '../../../mock/product.json'
+import { useAuthStore } from '@/store/authStore'
 
 const { Option } = Select
 
@@ -15,6 +16,8 @@ export default function Product() {
   const [detailRecord, setDetailRecord] = useState<any>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [form] = Form.useForm()
+  const userInfo = useAuthStore((s) => s.userInfo)
+  const canEdit = (perm: string) => userInfo?.permissions?.includes('*') || userInfo?.permissions?.includes(perm)
 
   const openEdit = (type: typeof modalType, record: any) => {
     setModalType(type)
@@ -23,21 +26,37 @@ export default function Product() {
     setIsModalOpen(true)
   }
 
+  const openAdd = () => {
+    setModalType('spu')
+    setEditingRecord(null)
+    form.resetFields()
+    setIsModalOpen(true)
+  }
+
   const handleSave = (values: any) => {
     const next = { ...data }
     if (modalType === 'spu') {
-      next.spuList = next.spuList.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      if (editingRecord === null) {
+        next.spuList = [{ key: Date.now(), ...values }, ...next.spuList]
+        message.info('仅作演示用，页面切换或刷新将会丢失')
+      } else {
+        next.spuList = next.spuList.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+        message.success('保存成功')
+      }
     } else if (modalType === 'category') {
       next.categories = next.categories.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      message.success('保存成功')
     } else if (modalType === 'brand') {
       next.brands = next.brands.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      message.success('保存成功')
     } else if (modalType === 'price') {
       next.prices = next.prices.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      message.success('保存成功')
     } else if (modalType === 'lifecycle') {
       next.lifecycle = next.lifecycle.map((item: any) => (item.key === editingRecord.key ? { ...item, ...values } : item))
+      message.success('保存成功')
     }
     setData(next)
-    message.success('保存成功')
     setIsModalOpen(false)
   }
 
@@ -48,7 +67,7 @@ export default function Product() {
     { title: '类目', dataIndex: 'category' },
     { title: '品牌', dataIndex: 'brand' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s === '已上架' ? 'green' : s === '待审核' ? 'orange' : 'default'}>{s}</Tag> },
-    { title: '操作', key: 'action', render: (_: any, r: any) => <Space><Button type="link" onClick={() => openEdit('spu', r)}>编辑</Button><Button type="link" onClick={() => { setDetailRecord(r); setIsDetailOpen(true) }}>详情</Button></Space> },
+    { title: '操作', key: 'action', render: (_: any, r: any) => <Space>{canEdit('product:edit') && <Button type="link" onClick={() => openEdit('spu', r)}>编辑</Button>}<Button type="link" onClick={() => { setDetailRecord(r); setIsDetailOpen(true) }}>详情</Button></Space> },
   ]
 
   const skuColumns = [
@@ -64,7 +83,7 @@ export default function Product() {
     { title: '类目名称', dataIndex: 'name' },
     { title: '层级', dataIndex: 'level' },
     { title: '下级类目', render: (_: any, r: any) => r.children },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('category', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('product:edit') ? <Button type="link" onClick={() => openEdit('category', r)}>编辑</Button> : null },
   ]
 
   const brandColumns = [
@@ -72,7 +91,7 @@ export default function Product() {
     { title: '所属国家', dataIndex: 'country' },
     { title: '经营类目', dataIndex: 'category' },
     { title: '状态', dataIndex: 'status', render: (s: string) => <Tag color={s.includes('预警') ? 'orange' : 'green'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('brand', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('product:edit') ? <Button type="link" onClick={() => openEdit('brand', r)}>编辑</Button> : null },
   ]
 
   const lifecycleColumns = [
@@ -81,7 +100,7 @@ export default function Product() {
     { title: '生命周期', dataIndex: 'status', render: (s: string) => <Tag color={s === '滞销' ? 'red' : s === '爆款' ? 'green' : 'blue'}>{s}</Tag> },
     { title: '周转天数', dataIndex: 'days' },
     { title: '建议操作', render: (_: any, r: any) => <span>{r.status === '滞销' ? '降价清仓/退货供应商' : r.status === '爆款' ? '加大库存与推广' : '保持观察'}</span> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('lifecycle', r)}>编辑</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('product:edit') ? <Button type="link" onClick={() => openEdit('lifecycle', r)}>编辑</Button> : null },
   ]
 
   const priceColumns = [
@@ -93,7 +112,7 @@ export default function Product() {
     { title: '活动价', dataIndex: 'activity' },
     { title: '平台售价', dataIndex: 'platform' },
     { title: '同步状态', dataIndex: 'sync', render: (s: string) => <Tag color={s === '同步成功' ? 'green' : 'red'}>{s}</Tag> },
-    { title: '操作', render: (_: any, r: any) => <Button type="link" onClick={() => openEdit('price', r)}>调价</Button> },
+    { title: '操作', render: (_: any, r: any) => canEdit('product:edit') ? <Button type="link" onClick={() => openEdit('price', r)}>调价</Button> : null },
   ]
 
   const spuData = (data?.spuList || []).filter((item: any) => {
@@ -118,8 +137,7 @@ export default function Product() {
               <Option value="上架">已上架</Option>
               <Option value="下架">已下架</Option>
             </Select>
-            <Button type="primary">新增SPU</Button>
-            <Button>批量导入</Button>
+            {canEdit('product:edit') && <><Button type="primary" onClick={openAdd}>新增SPU</Button><Button>批量导入</Button></>}
           </Space>
           <Table columns={spuColumns} dataSource={spuData} pagination={{ pageSize: 5 }} style={{ marginTop: '12px' }} />
           <div className="mt-4">
@@ -160,7 +178,7 @@ export default function Product() {
       </Modal>
 
       <Modal
-        title="编辑"
+        title={modalType === 'spu' && editingRecord === null ? '新增SPU' : '编辑'}
         open={isModalOpen}
         onOk={() => form.submit()}
         onCancel={() => setIsModalOpen(false)}
@@ -169,6 +187,7 @@ export default function Product() {
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {modalType === 'spu' && (
             <>
+              <Form.Item label="SPU编码" name="spuCode" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="商品标题" name="title" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="类目" name="category" rules={[{ required: true }]}><Input /></Form.Item>
               <Form.Item label="品牌" name="brand" rules={[{ required: true }]}><Input /></Form.Item>
